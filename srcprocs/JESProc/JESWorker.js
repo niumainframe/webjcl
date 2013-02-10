@@ -38,7 +38,7 @@ var JESWorker = function(file, username, password)
 	
 }
 
-// Officially inherit from ISrcProc
+// Officially inherit from EventEmitter
 JESWorker.prototype = new EventEmitter();
 JESWorker.prototype.constructor=JESWorker;
 
