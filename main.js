@@ -25,9 +25,9 @@ fs.readdir('./srcprocs', function (err, files)
 		
 		var file = files[index];
 		
-		// Skip if it isn't a .js file or an interface file
-		//if (file[0] == 'I')
-		//	continue;
+		//Skip README.md
+		if (file == "README.md")
+			continue;
 		
 		var name = file;
 		
