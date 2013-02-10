@@ -4,8 +4,14 @@ path = require('path');
 uuid = require('node-uuid');
 spawn = require('child_process').spawn;
 
+// Obtain the EventEmitter class to interit from.
+var EventEmitter = require('events').EventEmitter;
+
+
 var JESWorker = function(file, username, password)
 {
+	// Call EventEmitter's constructor.
+	EventEmitter.call(this);
 	
 	if (file == undefined)
 		throw "JES has no file!";
@@ -18,6 +24,7 @@ var JESWorker = function(file, username, password)
 	
 	this.tmpDir = os.tmpDir()+'/JESWorker';
 	this.workspace = this.tmpDir+"/"+this.id;
+	this.ready = false;
 	this.time = (new Date()).getTime();
 	
 	this.status = '202';
@@ -31,6 +38,11 @@ var JESWorker = function(file, username, password)
 	
 }
 
+// Officially inherit from ISrcProc
+JESWorker.prototype = new EventEmitter();
+JESWorker.prototype.constructor=JESWorker;
+
+
 JESWorker.prototype._createWorkspace = function()
 {
 	var self = this;
@@ -38,12 +50,12 @@ JESWorker.prototype._createWorkspace = function()
 	
 	// Ensure that we have a tmp directory.
 	if (!fs.existsSync(this.tmpDir))
-	{ 
-		fs.mkdir(this.tmpDir, 0700);
+	{
+		fs.mkdirSync(this.tmpDir, 0700);
 	}
 	
 	// Attempt to make the workspace.
-	fs.mkdir(this.workspace, 0700);
+	fs.mkdirSync(this.workspace, 0700);
 
 	
 	
@@ -56,8 +68,9 @@ JESWorker.prototype._createWorkspace = function()
 		this._username+"\npassword = " + this._password);
 	
 	
+	self.ready = true;
+	self.emit('ready', self);
 }
-
 
 JESWorker.prototype._destroyWorkspace = function()
 {
@@ -84,6 +97,7 @@ JESWorker.prototype.start = function(callback)
 {
 	
 	var self = this;
+	
 	
 	// Obtain the full path to JESftp.py
 	var JESftp_py = path.dirname(require.resolve('webjcl')) + '/JESftp.py';

@@ -58,14 +58,16 @@ JESProc.prototype.takeJob = function(action, files, options)
 			this.JobSet.addJob(worker);
 			
 			// Start the worker
-			worker.start(function()
-			{	// When the worker is done, have the processor emitt that
-				// it's done and stick the worker in the JobSet for retrieval.
-				self.emit(worker.id);
-				self.JobSet.addJob(worker);
-			});
-			
-			
+			if (worker.ready == false)
+			{
+				// Listen for the worker to be ready.
+				console.log("Waiting for worker to be ready.");
+				worker.on('ready', this._startWorker);
+			}
+			else 
+			{		// Start the worker if it's already ready.
+					this._startWorker(worker);
+			}
 			
 			// Return 202 Accepted along with the id.
 			return { status: 202, jobid: worker.id}
@@ -91,7 +93,19 @@ JESProc.prototype.getJob = function(jobid)
 }
 
 
+/* Specialized Methods */
 
+JESProc.prototype._startWorker = function(worker)
+{
+	var self = this;
+	
+	worker.start(function()
+		{	// When the worker is done, have the processor emitt that
+			// it's done and stick the worker in the JobSet for retrieval.
+			self.emit(worker.id);
+			self.JobSet.addJob(worker);
+		});
+}
 
 
 
