@@ -1,0 +1,5 @@
+{
+	host: '', 	
+	resTimeout: 5,
+	workerTimeout: 20 
+}

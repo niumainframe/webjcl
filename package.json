@@ -1,0 +1,10 @@
+{
+	"name": "WebJCL",
+
+	"dependencies":
+	{
+		"express":"latest",
+		"node-uuid":"latest"
+	}
+
+}
