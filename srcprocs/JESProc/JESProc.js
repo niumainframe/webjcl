@@ -1,20 +1,32 @@
 /*
- * Implementation of the ISrcProc interface.
+ * JESProc
+ * 
+ * Processes source code for consumption by IBM's job entry spooler.
+ * 
+ * Things that may be added to the ISrcProc specification:
+ *   * Inheritance from EventEmitter
+ *	   * Each job is assigned an ID, and the ID of that job ID is emitted
+ *	     when the job is complete.
+ * 
+ *   * Concept of a JobWorker
  * 
 */
 
 
 var os = require('os');
 
+var config = require('./config.json');
 var JobSet = require('./JobSet.js');
 var ISrcProc = require('webjcl/ISrcProc');
 var JESWorker = require('./JESWorker.js');
 
 
-// Make a JESProc constructor & have it call the parent's constructor.
+// JESProc constructor
 var JESProc = function() 
 {
 	
+	// Create a jobset to manage jobs.
+	// TODO: Interval cleaning of jobs?
 	this.JobSet = new JobSet();
 	
 	// Call the parent constructor on 'this' object.
@@ -26,12 +38,40 @@ JESProc.prototype = new ISrcProc();        // Here's where the inheritance occur
 JESProc.prototype.constructor=JESProc;
 
 
-// Reimplement Methods...
+//
+// 
+////////////////////////////////////////////////////////////////////////
+// Implement base ISrcProc methods.
+//
+ 
 JESProc.prototype.listJobOptions = function()
 {
 	console.error( "Not Implemented!" );
 }
 
+
+/** 
+ * JESProc.takeJob
+ * 
+ * Creates a new job for this source processor to handle.
+ * 
+ * @param string action
+ * 	The action to take on this job.  In this case, only one action is
+ * 	currently defined 'submit.'
+ * 
+ * @param files action
+ * 	An array of file objects.  In this implementation, the first file
+ *  is assumed as the JCL file to be submitted.
+ * 
+ * @param options
+ * 	The options object which currently requires the username and
+ * 	password fields.
+ * 
+ * @returns
+ * 	It returns {status, jobid} of the job that was created;
+ *  If job creation failed, it returns {status: 400}
+ * 
+ */
 JESProc.prototype.takeJob = function(action, files, options)
 {
 	var self = this;
@@ -85,15 +125,37 @@ JESProc.prototype.takeJob = function(action, files, options)
 	
 }
 
+
+
+
+/** 
+ * JESProc.getJob
+ * 
+ * Retrives the specified job by jobid.
+ * 
+ * @param int jobid
+ * 	The jobid to retrieve.
+ * 
+ * @returns
+ * 	It returns... a job!  Hopefully to be defined concretely later.
+ *  { id, status, output, files }
+ * 
+ */
 JESProc.prototype.getJob = function(jobid)
 {
 	var job = this.JobSet.getJob(jobid);
 	
+	// TODO: case where jobid doesn't exist.
 	return {id: job.id, status: job.status, output: job.output, files: job.outputFiles }
 }
 
 
-/* Specialized Methods */
+//
+//
+////////////////////////////////////////////////////////////////////////
+// Declare specialized methods of JESProc
+//
+
 
 JESProc.prototype._startWorker = function(worker)
 {
@@ -108,6 +170,8 @@ JESProc.prototype._startWorker = function(worker)
 }
 
 
-
+//
+//
+////////////////////////////////////////////////////////////////////////
 // Export this module.
 module.exports = JESProc;
