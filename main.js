@@ -1,6 +1,8 @@
 var express = require('express');
 var fs = require('fs');
 
+var config = require('./config.json');
+
 
 
 var app = express();
@@ -128,7 +130,7 @@ app.post('/srcprocs/:instance/jobs', function(req, res)
 		res.status(result.status);
 		res.json(result);
 		
-	}, 5000); // 5 seconds.
+	}, config.resTimeout *1000);
 
 	
 });
@@ -141,5 +143,5 @@ app.post('/srcprocs/:instance/jobs', function(req, res)
 app.get('/srcprocs/:instance/jobs/:jobid', notImplementedHandler);
 
 
-console.log("Listening on :8000");
-app.listen(8000);
+console.log("Listening on :"+config.port);
+app.listen(config.port);
