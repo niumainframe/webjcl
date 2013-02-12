@@ -3,11 +3,19 @@ os = require('os');
 path = require('path');
 uuid = require('node-uuid');
 spawn = require('child_process').spawn;
+async = require('async');
 
 // Obtain the EventEmitter class to interit from.
 var EventEmitter = require('events').EventEmitter;
 
-
+/**
+ * JESWorker Constructor
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 var JESWorker = function(file, username, password)
 {
 	// Call EventEmitter's constructor.
@@ -33,7 +41,13 @@ var JESWorker = function(file, username, password)
 	this.output = '';
 	
 	
-	this._createWorkspace();
+	
+	async.series(
+	[
+		this._createWorkspace.bind(this),
+		this._writeJobFiles.bind(this),
+		this._emitReady.bind(this)
+	]);
 	
 	
 }
@@ -43,33 +57,78 @@ JESWorker.prototype = new EventEmitter();
 JESWorker.prototype.constructor=JESWorker;
 
 
-JESWorker.prototype._createWorkspace = function()
+JESWorker.prototype._createWorkspace = function(callback)
 {
+	var worker = this;
+	
+	async.series(
+	[
+		function(next)
+		{
+			
+			fs.exists(worker.tmpDir, function(exists)
+			{
+				
+				if(!exists)
+					fs.mkdir(worker.tmpDir, 0700, next)
+
+				else
+					next();
+				
+			});
+			
+		},
+		
+		function(next)
+		{
+			fs.mkdir(worker.workspace, 0700, next);
+		}
+	
+	
+	], callback);
+	
+
+
+
+}
+
+JESWorker.prototype._writeJobFiles = function(callback)
+{
+	
 	var self = this;
-	
-	
-	// Ensure that we have a tmp directory.
-	if (!fs.existsSync(this.tmpDir))
-	{
-		fs.mkdirSync(this.tmpDir, 0700);
-	}
-	
-	// Attempt to make the workspace.
-	fs.mkdirSync(this.workspace, 0700);
 
 	
+	async.series(
+	[
+		function(next)
+		{
+			// Write the JCL file to the workspace.
+			fs.writeFile(self.workspace+'/'+self.file.path, self.file.data, "utf8", next)
+		},
+		
+		
+		function(next)
+		{
+			// Write the credentials config to the workspace.
+			fs.writeFile(self.workspace+'/.JESftp.cfg', 
+			"[JESftp]\nserver = zos.kctr.marist.edu\nusername = "+
+			self._username+"\npassword = " + self._password, next);
+			
+		}
+	],
+		
+	function(err, results)
+	{
+			callback();
+	});
 	
-	// Write the JCL file to the workspace.
-	fs.writeFile(this.workspace+'/'+this.file.path, this.file.data);
 	
-	// Write the credentials config to the workspace.
-	fs.writeFile(this.workspace+'/.JESftp.cfg', 
-		"[JESftp]\nserver = zos.kctr.marist.edu\nusername = "+
-		this._username+"\npassword = " + this._password);
-	
-	
-	self.ready = true;
-	self.emit('ready', self);
+}
+
+JESWorker.prototype._emitReady = function()
+{
+	this.ready = true;
+	this.emit('ready', this);
 }
 
 JESWorker.prototype._destroyWorkspace = function()

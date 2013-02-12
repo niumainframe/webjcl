@@ -2,11 +2,10 @@
  * JESProc
  * 
  * Processes source code for consumption by IBM's job entry spooler.
+ * Each job is assigned an ID, and the ID of that job ID is emitted
+ * when the job is complete.
  * 
  * Things that may be added to the ISrcProc specification:
- *   * Inheritance from EventEmitter
- *	   * Each job is assigned an ID, and the ID of that job ID is emitted
- *	     when the job is complete.
  * 
  *   * Concept of a JobWorker
  * 
@@ -102,7 +101,7 @@ JESProc.prototype.takeJob = function(action, files, options)
 			{
 				// Listen for the worker to be ready.
 				console.log("Waiting for worker to be ready.");
-				worker.on('ready', this._startWorker);
+				worker.on('ready', this._startWorker.bind(this));
 			}
 			else 
 			{		// Start the worker if it's already ready.
