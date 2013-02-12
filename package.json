@@ -1,10 +1,11 @@
 {
 	"name": "WebJCL",
-
+	"version": "0.1.0",
 	"dependencies":
 	{
-		"express":"latest",
-		"node-uuid":"latest"
+		"async":"0.2.x",
+		"express":"3.1.x",
+		"node-uuid":"1.4.x"
 	}
 
 }

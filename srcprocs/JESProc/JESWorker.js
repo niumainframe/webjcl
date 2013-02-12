@@ -5,8 +5,9 @@ uuid = require('node-uuid');
 spawn = require('child_process').spawn;
 async = require('async');
 
-// Obtain the EventEmitter class to interit from.
-var EventEmitter = require('events').EventEmitter;
+SrcProcJob = require('webjcl/SrcProcJob');
+
+
 
 /**
  * JESWorker Constructor
@@ -19,7 +20,7 @@ var EventEmitter = require('events').EventEmitter;
 var JESWorker = function(file, username, password)
 {
 	// Call EventEmitter's constructor.
-	EventEmitter.call(this);
+	SrcProcJob.call(this);
 	
 	if (file == undefined)
 		throw "JES has no file!";
@@ -32,13 +33,14 @@ var JESWorker = function(file, username, password)
 	
 	this.tmpDir = os.tmpDir()+'/JESWorker';
 	this.workspace = this.tmpDir+"/"+this.id;
-	this.ready = false;
 	this.time = (new Date()).getTime();
 	
-	this.status = '202';
+	this.status = SrcProcJob.status.new;
 	
 	this.outputFiles = [];
 	this.output = '';
+	
+	this.completion = SrcProcJob.completion.incomplete;
 	
 	
 	
@@ -46,17 +48,22 @@ var JESWorker = function(file, username, password)
 	[
 		this._createWorkspace.bind(this),
 		this._writeJobFiles.bind(this),
-		this._emitReady.bind(this)
+		this._emitReady.bind(this),
+		this.start.bind(this)
 	]);
 	
 	
 }
 
-// Officially inherit from EventEmitter
-JESWorker.prototype = new EventEmitter();
+// Officially inherit from SrcProcJob
+JESWorker.prototype = new SrcProcJob();
 JESWorker.prototype.constructor=JESWorker;
 
-
+//
+//
+////////////////////////////////////////////////////////////////////////
+// Specialized JESWorker methods.
+//
 JESWorker.prototype._createWorkspace = function(callback)
 {
 	var worker = this;
@@ -125,10 +132,14 @@ JESWorker.prototype._writeJobFiles = function(callback)
 	
 }
 
-JESWorker.prototype._emitReady = function()
+JESWorker.prototype._emitReady = function(callback)
 {
-	this.ready = true;
-	this.emit('ready', this);
+	
+	this.status = SrcProcJob.status.ready;
+	this.emit(SrcProcJob.status.ready, this);
+	
+	if (callback != undefined)
+		callback();
 }
 
 JESWorker.prototype._destroyWorkspace = function()
@@ -156,6 +167,9 @@ JESWorker.prototype.start = function(callback)
 {
 	
 	var self = this;
+	
+	this.status = SrcProcJob.status.running;
+
 	
 	
 	// Obtain the full path to JESftp.py
@@ -199,7 +213,12 @@ JESWorker.prototype.start = function(callback)
 			self.outputFiles = [{path: 'test-output.txt', type: 'text/plain', data: outdata}];
 			
 			// TODO prepare more output
-			self.status = 'done';
+			
+			self.status = SrcProcJob.status.done;
+			self.completion = SrcProcJob.completion.success;
+			
+			
+			self.emit(SrcProcJob.status.done, this);
 			
 			self._destroyWorkspace();
 			
