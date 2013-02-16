@@ -17,6 +17,7 @@ var os = require('os');
 var config = require('./config.json');
 var JobSet = require('./JobSet.js');
 var ISrcProc = require('../../framework/ISrcProc.js');
+var ISrcProcJob = require('../../framework/ISrcProcJob.js');
 var JESWorker = require('./JESWorker.js');
 
 
@@ -97,7 +98,7 @@ JESProc.prototype.takeJob = function(action, files, options)
 			this.JobSet.addJob(worker);
 			
 			// Emit the job's id when the job is done.
-			worker.once(SrcProcJob.status.done, function()
+			worker.once(ISrcProcJob.statusCode.done, function()
 			{
 				self.emit(worker.id);
 			});

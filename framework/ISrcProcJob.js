@@ -4,7 +4,7 @@
 // Obtain the EventEmitter class to interit from.
 EventEmitter = require('events').EventEmitter;
 
-var SrcProcJob = function(jobid, status, output, files)
+var ISrcProcJob = function(jobid, status, output, files)
 {
 
 	// Inherit from event emitter
@@ -23,7 +23,7 @@ var SrcProcJob = function(jobid, status, output, files)
 }
 
 
-SrcProcJob.prototype.getStruct = function()
+ISrcProcJob.prototype.getStruct = function()
 {
 	
 	return { 
@@ -36,8 +36,8 @@ SrcProcJob.prototype.getStruct = function()
 }
 
 // Inherit from EventEmitter
-SrcProcJob.prototype = new EventEmitter();  // Here's where the inheritance occurs 
-SrcProcJob.prototype.constructor=SrcProcJob;
+ISrcProcJob.prototype = new EventEmitter();  // Here's where the inheritance occurs 
+ISrcProcJob.prototype.constructor=ISrcProcJob;
 
 //
 //
@@ -45,15 +45,15 @@ SrcProcJob.prototype.constructor=SrcProcJob;
 // Static status code enums
 //
 
-SrcProcJob.status = {};
 
-// new: upon creation, but not ready to begin.
-// Files may have to be written or other preresiquites fetched.
-SrcProcJob.status.new     = 0;
+ISrcProcJob.statusCode = { new:     0, // Files may have to be written or other preresiquites fetched.
+                           ready:   1,
+                           running: 2,
+                           done:    3};
 
-SrcProcJob.status.ready   = 1;
-SrcProcJob.status.running = 2;
-SrcProcJob.status.done    = 3;
+
+
+
 
 
 //
@@ -61,11 +61,9 @@ SrcProcJob.status.done    = 3;
 ////////////////////////////////////////////////////////////////////////
 // Static completions code enums
 //
-SrcProcJob.completion = {};
-SrcProcJob.completion.incomplete = 4;
-SrcProcJob.completion.success    = 5;
-SrcProcJob.completion.fail       = 6;
+ISrcProcJob.completion = { incomplete: 4,
+                           success: 5,
+                           fail:    6 };
 
 
-
-module.exports = SrcProcJob
+module.exports = ISrcProcJob

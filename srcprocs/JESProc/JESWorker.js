@@ -7,7 +7,7 @@ var async = require('async');
 var config = require('./config.json');
 
 
-SrcProcJob = require('../../framework/SrcProcJob.js');
+var ISrcProcJob = require('../../framework/ISrcProcJob.js');
 
 // Strict umask
 process.umask(0077)
@@ -22,10 +22,10 @@ process.umask(0077)
  */
 var JESWorker = function(file, username, password)
 {
-	// Call SrcProcJob's constructor.
-	SrcProcJob.call(this);
-	
-	this.status = SrcProcJob.status.new;
+	// Call ISrcProcJob's constructor.
+	ISrcProcJob.call(this);
+
+	this.status = ISrcProcJob.statusCode.new;
 	
 	if (file == undefined)
 		throw "JES has no file!";
@@ -63,7 +63,7 @@ var JESWorker = function(file, username, password)
 	
 	
 	// Set completion status.
-	this.completion = SrcProcJob.completion.incomplete;
+	this.completion = ISrcProcJob.completion.incomplete;
 	
 	
 	/* * * * * * * * * * * * * *
@@ -80,8 +80,9 @@ var JESWorker = function(file, username, password)
 	
 }
 
-// Officially inherit from SrcProcJob
-JESWorker.prototype = new SrcProcJob();
+
+// Officially inherit from ISrcProcJob
+JESWorker.prototype = new ISrcProcJob();
 JESWorker.prototype.constructor=JESWorker;
 
 //
@@ -206,14 +207,15 @@ JESWorker.prototype._writeJobFiles = function(callback)
  * @param function callback
  * 	A function that should be called when complete.
  * 
- * @emits SrcProcJob.status.ready
+ * @emits ISrcProcJob.status.ready
  * 
  */
 JESWorker.prototype._emitReady = function(callback)
 {
 	
-	this.status = SrcProcJob.status.ready;
-	this.emit(SrcProcJob.status.ready, this);
+	this.status = ISrcProcJob.statusCode.ready;
+	
+	this.emit(ISrcProcJob.statusCode.ready, this);
 	
 	if (callback != undefined)
 		callback();
@@ -257,7 +259,7 @@ JESWorker.prototype._destroyWorkspace = function()
  * 
  * Starts processing the job
  * 
- * @emits SrcProcJob.status.done
+ * @emits ISrcProcJob.status.done
  * 
  */
 JESWorker.prototype.start = function(callback)
@@ -265,7 +267,7 @@ JESWorker.prototype.start = function(callback)
 	
 	var self = this;
 	
-	this.status = SrcProcJob.status.running;
+	this.status = ISrcProcJob.statusCode.running;
 
 	
 	
@@ -313,11 +315,11 @@ JESWorker.prototype.start = function(callback)
 			self.outputFiles = [{path: 'test-output.txt', type: 'text/plain', data: outdata}];
 			
 			// Set status codes.
-			self.status = SrcProcJob.status.done;
-			self.completion = SrcProcJob.completion.success;
+			self.status = ISrcProcJob.statusCode.done;
+			self.completion = ISrcProcJob.completion.success;
 			
 			// Emit our doneness
-			self.emit(SrcProcJob.status.done, this);
+			self.emit(ISrcProcJob.statusCode.done, this);
 			
 			// Clean everything up
 			self._destroyWorkspace();
