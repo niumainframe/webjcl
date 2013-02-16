@@ -1,4 +1,8 @@
 {
 	"port": 8000,
-	"resTimeout": 5
+	"ssl_port":8443,
+	
+	"resTimeout": 5,
+	
+	"__ssl_info" : "Please set ssl_key and ssl_cert for SSL."
 }

@@ -1,3 +1,5 @@
+var http  = require('http');
+var https = require('https');
 var express = require('express');
 var fs = require('fs');
 
@@ -8,17 +10,64 @@ var config = require('./config.json');
 console.log("Starting WebJCL " + package.version);
 
 
+//
+//
+////////////////////////////////////////////////////////////////////////////////
+// Start Express
+//
+
 var app = express();
+
+// Start HTTPS server if configuration is there.
+if (config.ssl_key != undefined && config.ssl_cert != undefined)
+{
+	
+	console.log("Loading SSL Certificates");
+	
+	var https_options = {};
+	
+	https_options.key = fs.readFileSync(config.ssl_key).toString();
+	https_options.cert = fs.readFileSync(config.ssl_cert).toString();
+	
+	app.use(function(req, res, next)
+	{
+		
+		if ('http' == req.protocol)
+			res.redirect("https://"+req.host+':'+config.ssl_port+req.url);
+		else
+			next();
+
+	});
+	
+	
+	var ssl_server = https.createServer(https_options, app).listen(config.ssl_port);
+	
+}
+
+
+// Start HTTP server
+var server = http.createServer(app).listen(config.port);
+
+
 app.use(express.bodyParser());
+
 
 // Serve static files out of the client directory.
 app.use(express.static('client'));
+
+
+//
+//
+////////////////////////////////////////////////////////////////////////////////
+// Load source processor modules.
+//
+
 
 // Maintains a list of registered source processors.
 var srcprocs = {}
 
 
-/* Register source processors */
+// For each module inside ./srcprocs, load it as a source processor
 fs.readdir('./srcprocs', function (err, files)
 {
 	
@@ -44,32 +93,18 @@ fs.readdir('./srcprocs', function (err, files)
 		
 	}
 	
-	console.log("Done loading source processors.")
-	
 	
 });
 	
 
 
-// A nice placeholder callback.
-function notImplementedHandler(req, res)
-{
-	res.status(501);
-	
-	var json = {}
-	
-	for (var i in req.params)
-	{
-		json[i] = req.params[i];
-	}
-
-	res.json(json);
-}
+//
+//
+////////////////////////////////////////////////////////////////////////////////
+// Begin binding REST API
+//
 
 
-/**
- * BEGIN REST IMPLEMENTATION *
- * 							**/
 
 //~ GET /srcproc
 //~ Return available source processors.
@@ -146,5 +181,33 @@ app.post('/srcprocs/:instance/jobs', function(req, res)
 app.get('/srcprocs/:instance/jobs/:jobid', notImplementedHandler);
 
 
-console.log("Listening on :"+config.port);
-app.listen(config.port);
+
+
+//
+//
+////////////////////////////////////////////////////////////////////////////////
+// Utility functions
+//
+
+// A nice placeholder callback.
+function notImplementedHandler(req, res)
+{
+	res.status(501);
+	
+	var json = {}
+	
+	for (var i in req.params)
+	{
+		json[i] = req.params[i];
+	}
+
+	res.json(json);
+}
+
+
+
+
+
+
+
+
