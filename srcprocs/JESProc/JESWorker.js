@@ -1,9 +1,11 @@
-fs = require('fs');
-os = require('os');
-path = require('path');
-uuid = require('node-uuid');
-spawn = require('child_process').spawn;
-async = require('async');
+var fs = require('fs');
+var os = require('os');
+var path = require('path');
+var uuid = require('node-uuid');
+var spawn = require('child_process').spawn;
+var async = require('async');
+var config = require('./config.json');
+
 
 SrcProcJob = require('../../framework/SrcProcJob.js');
 
@@ -174,10 +176,13 @@ JESWorker.prototype._writeJobFiles = function(callback)
 		
 		function(next)
 		{
+			console.log(config.host);
 			// Write the credentials config to the workspace.
 			fs.writeFile(self._configFile, 
-			"[JESftp]\nserver = zos.kctr.marist.edu\nusername = "+
-			self._username+"\npassword = " + self._password, "utf8", next);
+			"[JESftp]\n" +
+			"server = " + config.host + "\n" +
+			"username = " + self._username+ "\n" +
+			"password = " + self._password, next);
 			
 		}
 	],
