@@ -7,7 +7,7 @@
  * 
  * Things that may be added to the ISrcProc specification:
  * 
- *   * Concept of a JobWorker
+ *   * Concept of a JobWorker / Defined job object
  * 
 */
 
@@ -16,7 +16,7 @@ var os = require('os');
 
 var config = require('./config.json');
 var JobSet = require('./JobSet.js');
-var ISrcProc = require('webjcl/ISrcProc');
+var ISrcProc = require('../../framework/ISrcProc.js');
 var JESWorker = require('./JESWorker.js');
 
 

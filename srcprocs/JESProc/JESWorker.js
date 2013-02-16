@@ -5,7 +5,7 @@ uuid = require('node-uuid');
 spawn = require('child_process').spawn;
 async = require('async');
 
-SrcProcJob = require('webjcl/SrcProcJob');
+SrcProcJob = require('../../framework/SrcProcJob.js');
 
 
 
@@ -255,7 +255,8 @@ JESWorker.prototype.start = function(callback)
 	
 	
 	// Obtain the full path to JESftp.py
-	var JESftp_py = path.dirname(require.resolve('webjcl')) + '/JESftp.py';
+	var JESftp_py = path.resolve(__dirname, 'JESftp.py');
+	console.log(JESftp_py);
 	
 
 	
