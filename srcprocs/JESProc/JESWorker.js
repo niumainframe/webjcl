@@ -7,7 +7,8 @@ async = require('async');
 
 SrcProcJob = require('../../framework/SrcProcJob.js');
 
-
+// Strict umask
+process.umask(0077)
 
 /**
  * JESWorker Constructor
@@ -19,7 +20,7 @@ SrcProcJob = require('../../framework/SrcProcJob.js');
  */
 var JESWorker = function(file, username, password)
 {
-	// Call EventEmitter's constructor.
+	// Call SrcProcJob's constructor.
 	SrcProcJob.call(this);
 	
 	this.status = SrcProcJob.status.new;
@@ -30,19 +31,23 @@ var JESWorker = function(file, username, password)
 	// Generate a unique ID
 	this.id = uuid.v1();
 	
-	// Get the files situated.
-	this.file = file;
-	
-	// Make sure we have these.
-	this._username = username;
-	this._password = password;
-	
 	// Figure out where we're placing the files.
 	this._tmpDir = os.tmpDir()+'/JESWorker';
 	
 	// _workspace should be a clean folder we can use.
 	this._workspace = this._tmpDir+"/"+this.id;
 	
+	// Get the files situated.
+	this.jclFile = file;
+	this.jclFilePath = this._workspace+'/'+this.jclFile.path;
+	
+	// Make sure we have these.
+	this._username = username;
+	this._password = password;
+	this._configFile = this._workspace+'/.JESftp.cfg';
+	
+
+
 	
 	this.time = (new Date()).getTime();
 	
@@ -128,7 +133,12 @@ JESWorker.prototype._createWorkspace = function(callback)
 		}
 	
 	
-	], callback);
+	], function(err, results){
+		
+		err == null || console.log(err);
+		
+		callback();
+	});
 	
 
 
@@ -158,16 +168,16 @@ JESWorker.prototype._writeJobFiles = function(callback)
 		function(next)
 		{
 			// Write the JCL file to the workspace.
-			fs.writeFile(self._workspace+'/'+self.file.path, self.file.data, "utf8", next)
+			fs.writeFile(self.jclFilePath, self.jclFile.data, "utf8", next)
 		},
 		
 		
 		function(next)
 		{
 			// Write the credentials config to the workspace.
-			fs.writeFile(self._workspace+'/.JESftp.cfg', 
+			fs.writeFile(self._configFile, 
 			"[JESftp]\nserver = zos.kctr.marist.edu\nusername = "+
-			self._username+"\npassword = " + self._password, next);
+			self._username+"\npassword = " + self._password, "utf8", next);
 			
 		}
 	],
@@ -261,7 +271,10 @@ JESWorker.prototype.start = function(callback)
 
 	
 	// Invoke JESftp.py with python
-	var	python = spawn('python', [JESftp_py, this._workspace+'/'+this.file.path], {cwd: this._workspace});
+	var	python = spawn('python', [JESftp_py, 
+	                              '--config', this._configFile,
+	                              this.jclFilePath],
+	                               {cwd: this._workspace});
 	
 	
 	
@@ -278,9 +291,6 @@ JESWorker.prototype.start = function(callback)
 		self.output += data;
 	});
 	
-	
-	// Write username and password (BROKEN)
-	python.stdin.write("zos.kctr.marist.edu\n"+this._username+"\n"+this._password+"\n");
 	
 	
 	

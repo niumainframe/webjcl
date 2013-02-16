@@ -1,8 +1,11 @@
 var express = require('express');
 var fs = require('fs');
 
+var package = require('./package.json');
 var config = require('./config.json');
 
+
+console.log("Starting WebJCL " + package.version);
 
 
 var app = express();
