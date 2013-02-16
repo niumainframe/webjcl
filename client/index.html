@@ -32,7 +32,7 @@
 </head>
 <body>
 <div style="width:100%;height:10%;">
-	WebJCL proof of concept <button id="sub">Submit Job</button>
+	WebJCL proof of concept <input type="text" id="mar_username" value="mar_username"/><input type="password" id="mar_password" value="mar_password"/><button id="sub">Submit Job</button>
 </div>
 <div id="editor">
 //KC03F57A JOB ,'WebJCL',MSGCLASS=H                           
@@ -90,7 +90,7 @@ MAIN CSECT
 		
 		$.ajax('./srcprocs/JESProc/jobs', 
 		{	type: "POST",
-			data: {action: "submit", files: [{path:"test.jcl", data: editor.getValue()}], "options": {"username": "", "password": ""}},
+			data: {action: "submit", files: [{path:"test.jcl", data: editor.getValue()}], "options": {"username": $("#mar_username")[0].value, "password": $("#mar_password")[0].value}},
 			success: function(data, status, xhr)
 			{
 				console.log(data);
