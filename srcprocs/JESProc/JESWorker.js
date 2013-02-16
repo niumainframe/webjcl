@@ -176,7 +176,7 @@ JESWorker.prototype._writeJobFiles = function(callback)
 		
 		function(next)
 		{
-			console.log(config.host);
+			
 			// Write the credentials config to the workspace.
 			fs.writeFile(self._configFile, 
 			"[JESftp]\n" +
@@ -271,7 +271,7 @@ JESWorker.prototype.start = function(callback)
 	
 	// Obtain the full path to JESftp.py
 	var JESftp_py = path.resolve(__dirname, 'JESftp.py');
-	console.log(JESftp_py);
+	
 	
 
 	
