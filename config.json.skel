@@ -4,5 +4,6 @@
 	
 	"resTimeout": 5,
 	
-	"__ssl_info" : "Please set ssl_key and ssl_cert for SSL."
+	"__ssl_info" : "Please set ssl_key and ssl_cert for SSL.",
+	"ssl_enforce" : false
 }

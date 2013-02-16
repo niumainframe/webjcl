@@ -29,6 +29,24 @@ if (config.ssl_key != undefined && config.ssl_cert != undefined)
 	https_options.key = fs.readFileSync(config.ssl_key).toString();
 	https_options.cert = fs.readFileSync(config.ssl_cert).toString();
 	
+	var ssl_server = https.createServer(https_options, app).listen(config.ssl_port);
+	
+}
+
+
+// Start HTTP server
+var server = http.createServer(app).listen(config.port);
+
+//
+//
+////////////////////////////////////////////////////////////////////////////////
+// Register middleware.
+//
+
+
+// Should we enforce an SSL connection?
+if (config.ssl_enforce == true)
+{
 	app.use(function(req, res, next)
 	{
 		
@@ -38,16 +56,8 @@ if (config.ssl_key != undefined && config.ssl_cert != undefined)
 			next();
 
 	});
-	
-	
-	var ssl_server = https.createServer(https_options, app).listen(config.ssl_port);
-	
 }
-
-
-// Start HTTP server
-var server = http.createServer(app).listen(config.port);
-
+	
 
 app.use(express.bodyParser());
 
@@ -102,6 +112,7 @@ fs.readdir('./srcprocs', function (err, files)
 //
 ////////////////////////////////////////////////////////////////////////////////
 // Begin binding REST API
+// BOUND TO CHANGE
 //
 
 
