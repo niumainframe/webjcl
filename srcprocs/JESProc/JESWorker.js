@@ -22,6 +22,9 @@ process.umask(0077)
  */
 var JESWorker = function(file, username, password)
 {
+	
+	var self = this;
+	
 	// Call ISrcProcJob's constructor.
 	ISrcProcJob.call(this);
 
@@ -30,28 +33,23 @@ var JESWorker = function(file, username, password)
 	if (file == undefined)
 		throw "JES has no file!";
 	
-	// Generate a unique ID
-	this.id = uuid.v1();
+	
+	this.jclFile = file;
 	
 	// Figure out where we're placing the files.
 	this._tmpDir = os.tmpDir()+'/JESWorker';
 	
-	// _workspace should be a clean folder we can use.
-	this._workspace = this._tmpDir+"/"+this.id;
 	
-	// Get the files situated.
-	this.jclFile = file;
-	this.jclFilePath = this._workspace+'/'+this.jclFile.path;
 	
 	// Make sure we have these.
 	this._username = username;
 	this._password = password;
-	this._configFile = this._workspace+'/.JESftp.cfg';
+	
 	
 
 
 	
-	this.time = (new Date()).getTime();
+	this.time = Date();
 	
 	
 	// outputFiles ought to contain an array of 
@@ -67,14 +65,23 @@ var JESWorker = function(file, username, password)
 	
 	
 	/* * * * * * * * * * * * * *
-	 * PREPARE AND PROCESS JOB *
+	 * PREPARE JOB             *
 	 * * * * * * * * * * * * * */
 	async.series(
 	[
+		function(callback)
+		{
+			if (self.id != undefined)
+				callback();
+				
+			else
+				self.once('setID', callback);
+			
+			
+		},
 		this._createWorkspace.bind(this),
 		this._writeJobFiles.bind(this),
-		this._emitReady.bind(this),
-		this.start.bind(this)
+		this._emitReady.bind(this)
 	]);
 	
 	
@@ -84,6 +91,7 @@ var JESWorker = function(file, username, password)
 // Officially inherit from ISrcProcJob
 JESWorker.prototype = new ISrcProcJob();
 JESWorker.prototype.constructor=JESWorker;
+
 
 //
 //
@@ -252,7 +260,38 @@ JESWorker.prototype._destroyWorkspace = function()
 }
 
 
+JESWorker.prototype.setID = function(id)
+{
+	if (id == undefined)
+	{
+		// Generate a unique ID
+		this.id = uuid.v1();
+	}
+	
+	else
+		this.id = id;
+		
+	
+	this._defineWorkspacePaths();
+	
+	console.log('setID: '+ id);
+	this.emit('setID');
+	
+}
 
+JESWorker.prototype._defineWorkspacePaths = function()
+{
+	
+	// _workspace should be a clean folder we can use.
+	this._workspace = this._tmpDir+"/"+this.id;
+	
+	// Get the files situated.
+
+	this.jclFilePath = this._workspace+'/'+this.jclFile.path;
+	this._configFile = this._workspace+'/.JESftp.cfg';
+	
+	
+}
 
 /**
  * JESWorker.start
@@ -275,13 +314,14 @@ JESWorker.prototype.start = function(callback)
 	var JESftp_py = path.resolve(__dirname, 'JESftp.py');
 	
 	
-
+	console.log(this._configFile + this.jclFilePath + this._workspace);
 	
 	// Invoke JESftp.py with python
 	var	python = spawn('python', [JESftp_py, 
 	                              '--config', this._configFile,
 	                              this.jclFilePath],
 	                               {cwd: this._workspace});
+	
 	
 	
 	

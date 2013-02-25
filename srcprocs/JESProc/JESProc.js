@@ -76,6 +76,7 @@ JESProc.prototype.takeJob = function(action, files, options)
 {
 	var self = this;
 	
+	
 	// Assume first file is the jcl file.
 	var file = files[0];
 	
@@ -95,13 +96,27 @@ JESProc.prototype.takeJob = function(action, files, options)
 			worker = new JESWorker(file, options.username, options.password);
 			
 			// ... and stick it in the JobSet.
-			this.JobSet.addJob(worker);
-			
-			// Emit the job's id when the job is done.
-			worker.once(ISrcProcJob.statusCode.done, function()
+			this.JobSet.addJob(worker, function(err, id)
 			{
-				self.emit(worker.id);
+				
+				worker.once(ISrcProcJob.statusCode.ready, function()
+				{
+					worker.start(function(){});
+				});
+				
+				
+				// Emit the job's id when the job is done.
+				worker.once(ISrcProcJob.statusCode.done, function()
+				{
+					self.JobSet.updateJob(worker);
+					self.emit(worker.id);
+				});
+				
+
+			
 			});
+			
+
 			
 
 			// Return 202 Accepted along with the id.
@@ -131,17 +146,23 @@ JESProc.prototype.takeJob = function(action, files, options)
  * @param int jobid
  * 	The jobid to retrieve.
  * 
- * @returns
- * 	It returns... a job!  Hopefully to be defined concretely later.
- *  { id, status, output, files }
+ * @callback
  * 
  */
-JESProc.prototype.getJob = function(jobid)
+JESProc.prototype.getJob = function(jobid, callback)
 {
-	var job = this.JobSet.getJob(jobid);
 	
-	// TODO: case where jobid doesn't exist.
-	return {id: job.id, status: job.status, output: job.output, files: job.outputFiles }
+	var job = this.JobSet.getJob(jobid, function(err, job)
+	{
+
+			
+		callback(err, job);
+		
+		
+	});
+	
+
+	
 }
 
 
