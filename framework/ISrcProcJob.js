@@ -23,6 +23,11 @@ var ISrcProcJob = function(jobid, status, output, files)
 }
 
 
+// Inherit from EventEmitter
+ISrcProcJob.prototype = new EventEmitter();  // Here's where the inheritance occurs 
+ISrcProcJob.prototype.constructor=ISrcProcJob;
+
+
 ISrcProcJob.prototype.getStruct = function()
 {
 	
@@ -35,9 +40,7 @@ ISrcProcJob.prototype.getStruct = function()
 	
 }
 
-// Inherit from EventEmitter
-ISrcProcJob.prototype = new EventEmitter();  // Here's where the inheritance occurs 
-ISrcProcJob.prototype.constructor=ISrcProcJob;
+
 
 //
 //
