@@ -433,8 +433,18 @@ function notImplementedHandler(req, res)
 
 
 
-
-
+// Cheap crash report sending.
+process.on('uncaughtException', function (err) {
+ 
+  var dump = JSON.stringify(err)+JSON.stringify(process.env);
+  require("./crash-report.js")(dump, function()
+  {
+	  
+  });
+  
+  setTimeout(function(){process.exit(code=1)}, 4000);
+  
+});
 
 
 
