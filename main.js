@@ -5,7 +5,7 @@ var fs = require('fs');
 var mongo = require('./mongo.js');
 var Authenticator = require('./Authenticator');
 var package = require('./package.json');
-var config = require('./config.json');
+var config = require('./config.js');
 
 
 console.log("Starting WebJCL " + package.version);
@@ -48,34 +48,21 @@ var server = http.createServer(app).listen(config.port);
 // Should we enforce an SSL connection?
 if (config.ssl_enforce == true)
 {
+	console.log("Forcing SSL.");
 	app.use(function(req, res, next)
 	{
 		
-		if ('http' == req.protocol)
-			res.redirect("https://"+req.host+':'+config.ssl_port+req.url);
-		else
+		if ('https' == req.protocol || req.headers["x-forwarded-proto"] === "https")
 			next();
+		else
+			res.redirect("https://"+req.host+':'+config.ssl_port+req.url);
+			
 
 	});
 }
-	
 
-app.use(function(req, res, next)
-{
-	if (req.params)
-	{
-		if (req.params.instance)
-		{
-
-		}
-	}
-	
-	next();
-	
-	
-});
-
-
+// Used to obtain the username/password from 
+// HTTP basic auth for use in routes.
 function customAuth(req, res, next)
 {
 	var authorization = req.get('Authorization');
