@@ -28,18 +28,6 @@ ISrcProcJob.prototype = new EventEmitter();  // Here's where the inheritance occ
 ISrcProcJob.prototype.constructor=ISrcProcJob;
 
 
-ISrcProcJob.prototype.getStruct = function()
-{
-	
-	return { 
-		jobid: this.id,
-		status: this.status,
-		output: this.output,
-		files: this.files
-	};
-	
-}
-
 
 
 //

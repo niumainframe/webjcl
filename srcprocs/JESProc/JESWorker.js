@@ -33,8 +33,8 @@ var JESWorker = function(file, username, password)
 	if (file == undefined)
 		throw "JES has no file!";
 	
-	
-	this.jclFile = file;
+	this.files = [file];
+	this._jclFile = file;
 	
 	// Figure out where we're placing the files.
 	this._tmpDir = os.tmpDir()+'/JESWorker';
@@ -179,7 +179,7 @@ JESWorker.prototype._writeJobFiles = function(callback)
 		function(next)
 		{
 			// Write the JCL file to the workspace.
-			fs.writeFile(self.jclFilePath, self.jclFile.data, "utf8", next)
+			fs.writeFile(self._jclFilePath, self._jclFile.data, "utf8", next)
 		},
 		
 		
@@ -265,16 +265,20 @@ JESWorker.prototype.setID = function(id)
 	if (id == undefined)
 	{
 		// Generate a unique ID
-		this.id = uuid.v1();
+		this.id  = uuid.v1();
+		this._id = this.id;
 	}
 	
 	else
+	{
 		this.id = id;
+		this._id = this.id;
+	}
 		
 	
 	this._defineWorkspacePaths();
 	
-	console.log('setID: '+ id);
+	
 	this.emit('setID');
 	
 }
@@ -287,7 +291,7 @@ JESWorker.prototype._defineWorkspacePaths = function()
 	
 	// Get the files situated.
 
-	this.jclFilePath = this._workspace+'/'+this.jclFile.path;
+	this._jclFilePath = this._workspace+'/'+this._jclFile.path;
 	this._configFile = this._workspace+'/.JESftp.cfg';
 	
 	
@@ -314,12 +318,12 @@ JESWorker.prototype.start = function(callback)
 	var JESftp_py = path.resolve(__dirname, 'JESftp.py');
 	
 	
-	console.log(this._configFile + this.jclFilePath + this._workspace);
+	console.log(this._configFile + this._jclFilePath + this._workspace);
 	
 	// Invoke JESftp.py with python
 	var	python = spawn('python', [JESftp_py, 
 	                              '--config', this._configFile,
-	                              this.jclFilePath],
+	                              this._jclFilePath],
 	                               {cwd: this._workspace});
 	
 	
@@ -374,5 +378,26 @@ JESWorker.prototype.start = function(callback)
 	});
 	
 }
+
+
+JESWorker.prototype.getStruct = function()
+{
+	
+	var clean_job = {}
+			
+	for (var key in this)
+	{
+		
+		if (key[0] == '_' && key != '_id')
+			continue;
+			
+		clean_job[key] = this[key];
+
+	}
+	
+	return clean_job;
+	
+}
+
 
 module.exports = JESWorker;

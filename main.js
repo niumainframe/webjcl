@@ -163,9 +163,26 @@ app.post('/srcprocs/:instance/jobs', function(req, res)
 	
 		console.log(req.params.instance + ": job " + result.jobid +" done.");
 		
-		var response = instance.getJob(result.jobid);
+		instance.getJob(result.jobid, function(err, job)
+		{
+			
+			var clean_job = {}
+			
+			for (var key in job)
+			{
+				
+				if (key[0] == '_')
+					continue;
+					
+				clean_job[key] = job[key];
+
+			}
+			
+			res.json(clean_job);
+			
+		});
 		
-		res.json(response);
+		
 		
 	});
 	
@@ -189,7 +206,33 @@ app.post('/srcprocs/:instance/jobs', function(req, res)
 //~ Returns status and output of the job. It should send the browser the no-cache header. 
 //~ Return structure: { status, jobid, output }
 
-app.get('/srcprocs/:instance/jobs/:jobid', notImplementedHandler);
+app.get('/srcprocs/:instance/jobs/:jobid', function(req, res)
+{
+
+	// Is a valid SrcProc being requested?
+	if (srcprocs[req.params.instance] == undefined)
+	{
+		res.send(404);
+		return;
+	}
+		
+	// Find instance of our SrcProc
+	var instance = srcprocs[req.params.instance];
+
+
+	var jobid = req.params.jobid;
+	
+	instance.getJob(jobid, function(err, job)
+	{
+		
+		
+		res.json(job);
+		
+	});
+
+
+
+});
 
 
 

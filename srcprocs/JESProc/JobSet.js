@@ -35,7 +35,7 @@ JobSet.prototype.addJob = function(job, callback)
 		!err || console.log(err);
 		
 		// Insert the job object
-		coll.insert(job, function(err, records)
+		coll.insert(job.getStruct(), function(err, records)
 		{
 			
 			if (err)
@@ -71,9 +71,16 @@ JobSet.prototype.updateJob = function(job)
 		
 		!err || console.log(err);
 		
+		
+		job = job.getStruct();
+		console.log(job);
+		
 		// Insert the job object
 		coll.save(job, function(err, record)
 		{
+			
+			
+			
 			
 			if (err)
 				console.log(err);
@@ -111,16 +118,16 @@ JobSet.prototype.getJob = function(id, callback)
 			!err || console.log(err);
 			
 			
+			if (!(id instanceof ObjectId))
+				id = ObjectId(id);
+				
+			var selector = {_id: id };
 			
-			var selector = {_id: ObjectId(id)};
 			
-			console.log(selector);
 			
 
 			coll.findOne(selector, function(err, result)
 			{
-				
-				console.log(result);
 				
 				!err || console.log(err);
 				
