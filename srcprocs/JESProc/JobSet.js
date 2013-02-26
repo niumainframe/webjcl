@@ -1,23 +1,29 @@
-var mongodb = require('mongodb');
+
+var mongodb = require('../../mongo.js');
 var ObjectId = require('mongodb').ObjectID
 var async = require('async');
 
 var config = require('./config.json');
 
+var ISrcProcJob = require('../../framework/ISrcProcJob.js');
+
 var JobSet = function()
 {
 	var self = this;
 	
-	this._mongo_uri  = 'mongodb://localhost:27017/JESProc';
-	this._mongo_coll = 'Jobs';
+	this._mongo_db = mongodb;
 	
-	// Obtain the Db
-	mongodb.Db.connect(this._mongo_uri, function(err, db)
-	{
-		self._mongo_db = db;
-	});
+	
+	this._mongo_coll = 'Jobs';
     
 	this.set = {};
+	
+	
+	// Remove completed jobs from the memory set every 5 minutes.
+	setInterval(function()
+	{
+		self._pruneJobs();	
+	}, 5*60*1000);
 
 }
 
@@ -73,7 +79,6 @@ JobSet.prototype.updateJob = function(job)
 		
 		
 		job = job.getStruct();
-		console.log(job);
 		
 		// Insert the job object
 		coll.save(job, function(err, record)
@@ -119,7 +124,18 @@ JobSet.prototype.getJob = function(id, callback)
 			
 			
 			if (!(id instanceof ObjectId))
-				id = ObjectId(id);
+			{
+				try
+				{
+					id = ObjectId(id);
+				}
+				
+				catch (e)
+				{
+					// Assuming that a bad ID was passed: not found it.
+					callback(null, null);
+				}
+			}
 				
 			var selector = {_id: id };
 			
@@ -151,15 +167,21 @@ JobSet.prototype.listJobs = function(user, callback)
 	{
 		!err || console.log(err);
 		
-		var selector = {_id: id};
-		
-		
-		coll.findOne(selector, function(err, result)
+		var selector = {username: user};
+
+		coll.find(selector, {id:"", time:"", username: ""},{limit: 5, sort: {id:-1}}, function(err, result)
 		{
 			
 			!err || console.log(err);
 			
-			callback(err, result);
+			result.toArray(function(err, array)
+			{
+				
+				callback(err, array);
+				
+			});
+			
+			
 			
 		});
 		
@@ -181,4 +203,80 @@ JobSet.prototype._assertSchema = function()
 
 }
 
+
+JobSet.prototype._pruneJobs = function()
+{
+	// Prune memory set
+	for (j in this.set)
+	{
+		
+		if (this.set[j].status == ISrcProcJob.statusCode.done)
+		{
+			delete this.set[j];
+		}
+		
+	}
+	
+	/*
+	console.log("pruning");
+	this._mongo_db.collection(this._mongo_coll, function(err, coll)
+	{
+		
+		coll.distinct("username", function(err, usernames)
+		{
+			
+			async.eachSeries(usernames,
+			function(item, callback)
+			{
+				
+				var username = item;
+				
+				console.log("pruning " + username);
+				
+				coll.find({username:username},{_id:""}, function(err, cursor)
+				{
+					
+					cursor.count(function(err, cnt)
+					{
+						
+						console.log({username:username+' '+cnt});
+						
+						if(cnt > 5)
+						{
+							
+							coll.find({username:username},
+									  [['time',1]],
+									  {limit:(cnt-5)}, function(err, result)
+							{
+								
+								result.each(function(err, item){console.log(item)});
+								callback();
+								
+							});
+						
+						}
+						
+						else 
+						
+						callback();
+						
+					});
+					
+				});				
+				
+			},
+			function(err)
+			{
+				
+				console.log('done');
+				
+			}); //async.eachSeries
+
+		}); // coll.distinct
+		
+	}); // db.collection
+	
+	*/
+	
+}
 module.exports = JobSet;

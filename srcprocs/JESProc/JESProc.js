@@ -22,11 +22,15 @@ var JESWorker = require('./JESWorker.js');
 
 
 // JESProc constructor
-var JESProc = function() 
+var JESProc = function()
 {
+	var self = this;
 	
+		
 	// Create a jobset to manage jobs.
 	// TODO: Interval cleaning of jobs?
+		
+	// Give the db instance to JobSet.
 	this.JobSet = new JobSet();
 	
 	// Call the parent constructor on 'this' object.
@@ -67,12 +71,12 @@ JESProc.prototype.listJobOptions = function()
  * 	The options object which currently requires the username and
  * 	password fields.
  * 
- * @returns
+ * @callback
  * 	It returns {status, jobid} of the job that was created;
  *  If job creation failed, it returns {status: 400}
  * 
  */
-JESProc.prototype.takeJob = function(action, files, options)
+JESProc.prototype.takeJob = function(action, files, options, callback)
 {
 	var self = this;
 	
@@ -99,6 +103,10 @@ JESProc.prototype.takeJob = function(action, files, options)
 			this.JobSet.addJob(worker, function(err, id)
 			{
 				
+				// return the id of the new job.
+				callback({status: 202, id: id});
+				
+				// Start the worker once it's ready.
 				worker.once(ISrcProcJob.statusCode.ready, function()
 				{
 					worker.start(function(){});
@@ -116,17 +124,15 @@ JESProc.prototype.takeJob = function(action, files, options)
 			
 			});
 			
-
-			
-
-			// Return 202 Accepted along with the id.
-			return { status: 202, jobid: worker.id}
 			
 		
 			break;
 			
+			
 		default:
-			return { status: 400, info: "Unknown job action." };
+		
+			callback({status: 400});
+			
 			break;
 		
 	}
@@ -166,6 +172,18 @@ JESProc.prototype.getJob = function(jobid, callback)
 }
 
 
+
+JESProc.prototype.listJobs = function(user, callback)
+{
+	
+	this.JobSet.listJobs(user, function(err, jobs)
+	{
+		
+		callback(err, jobs);
+			
+	});
+	
+}
 
 
 //

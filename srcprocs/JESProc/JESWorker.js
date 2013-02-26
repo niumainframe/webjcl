@@ -7,6 +7,7 @@ var async = require('async');
 var config = require('./config.json');
 
 
+
 var ISrcProcJob = require('../../framework/ISrcProcJob.js');
 
 // Strict umask
@@ -42,7 +43,7 @@ var JESWorker = function(file, username, password)
 	
 	
 	// Make sure we have these.
-	this._username = username;
+	this.username = username;
 	this._password = password;
 	
 	
@@ -190,7 +191,7 @@ JESWorker.prototype._writeJobFiles = function(callback)
 			fs.writeFile(self._configFile, 
 			"[JESftp]\n" +
 			"server = " + config.host + "\n" +
-			"username = " + self._username+ "\n" +
+			"username = " + self.username+ "\n" +
 			"password = " + self._password, next);
 			
 		}
