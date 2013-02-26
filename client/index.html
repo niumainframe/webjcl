@@ -18,21 +18,29 @@
 		
 		width:35%;
 		
+		
 	}
     
     #output {
 		width:65%;
 		margin-left:35%;
-		float:right;
+		
+	}
+	
+	#options {
+		
+		
 	}
     
     
 </style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+	<link href="css/ui-lightness/jquery-ui-1.10.1.custom.css" rel="stylesheet">
+	<script src="js/jquery-1.9.1.js"></script>
+	<script src="js/jquery-ui-1.10.1.custom.js"></script>
 </head>
 <body>
 <div style="width:100%;height:10%;">
-	WebJCL proof of concept <input type="text" id="mar_username" value="mar_username"/><input type="password" id="mar_password" value="mar_password"/><button id="sub">Submit Job</button>
+	WebJCL Alpha Test | <button id="sub">Submit Job</button> Previous Jobs: <select id="jobs"></select>
 </div>
 <div id="editor">
 //KC03F57A JOB ,'WebJCL',MSGCLASS=H                           
@@ -55,33 +63,201 @@ MAIN CSECT
 </div>
 
 <div id="output">
-	Welcome to the prototype of WebJCL - this demonstrates a JCL JobProcessor 
-	accessible via REST. This page POSTs the contents of the left pane to
-	the /srcprocs/JESPrc/jobs resource. Lots of API documentation will 
-	have to be revised in the next coming days.
 	
-	Output will show up here, but there is also some submission logging 
-	in the browser console.
-	
-	Currently there are many things hard coded in the server in such like 
-	username, password, and file names.
-	
-	
-	Bug:  There is an asynchronous bug where sometimes sending the job fails (no such file or directory.)  
-	This is because of some of the highly asynchronous nature of Node that I have been sloppy with.
-	Just try it again.
-	
-	Client Implementation: Currently this thrown together webpage does not handle
-	the case where the job takes too long while sumitting to Marist: it will fail (see console)
-	and require a refresh.
 </div>
-    
-<script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+
+<div id="dialog-form" title="Your marist credentials">
+  <p class="validateTips">
+	  <strong>Make sure to type in your marist password correctly.</strong>  We haven't built a password reset yet.<br/><br/>
+	  This will save your last 5 jobs, but make sure to copy/paste your code out occasionally in case it blows up.
+  </p>
+ 
+  <form>
+  <fieldset>
+    KC-ID
+    <input type="text" name="KCID" id="kcid" class="text ui-widget-content ui-corner-all" /><br/>
+    Password:
+    <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all"  /><br/>
+    <label for="password">Password (repeat):</label>
+    <input type="password" name="password_repeat" id="password_repeat" class="text ui-widget-content ui-corner-all" />
+  </fieldset>
+  </form>
+</div>
+
+<script src="js/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
     var editor = ace.edit("editor");
-    var editor2 = ace.edit("output");
-    //editor.setTheme("ace/theme/monokai");
-    //editor.getSession().setMode("ace/mode/javascript");
+    var output = ace.edit("output");
+    
+    var credentials = {};
+    
+    
+    
+    $("select#jobs").change(function(){
+		getJob($(this).children(":selected").attr("id"));
+	});
+    
+    
+    function pollForJobs(first)
+    {
+		
+		$.ajax('./srcprocs/JESProc/jobs', 
+		{	type: "GET",
+			headers: { "Authorization" : "Basic " + window.btoa(credentials.username + ":" + credentials.password) },
+			success: function(data, status, xhr)
+			{
+				console.log(data);
+				
+				$("#jobs")[0].innerHTML = "";
+				
+				for (j in data)
+				{
+					
+					var job = document.createElement("option");
+					job.setAttribute('id', data[j].id);
+					job.innerHTML = data[j].time;
+					
+					$(job).change(function()
+					{
+						getJob(data[j].id);
+					});
+					
+					$("#jobs").append(job);
+					
+					
+				}
+				
+				if (first != undefined) {
+					if ($("#jobs").children().length != 0) {
+					getJob($("#jobs").children().attr('id'));
+					}
+				}
+				
+				$("#sub")[0].innerHTML = "Submit Job";
+				$("#sub")[0].disabled = false;
+				
+			},
+			
+			error: function(data, status, xhr)
+			{
+				alert('something went wrong: ' +data.responseText);
+				console.log(data);
+				console.log(status);
+				console.log(xhr);
+				$("#sub")[0].innerHTML = "Submit Job";
+				$("#sub")[0].disabled = false;
+			}
+		})
+		
+		
+		
+	}
+    
+    function setUpEverything(username, password)
+    {
+		credentials.username = username;
+		credentials.password = password;
+		
+		pollForJobs(true);
+		
+		
+		
+	}
+	
+	function getJob(id)
+	{
+		
+		$.ajax('./srcprocs/JESProc/jobs/'+id, 
+		{	type: "GET",
+			headers: { "Authorization" : "Basic " + window.btoa(credentials.username + ":" + credentials.password) },
+			success: function(data, status, xhr)
+			{
+				console.log(data);
+				
+				editor.setValue(data.files[0].data);
+				output.setValue(data.outputFiles[0].data);
+				
+				
+				
+			},
+			error: function(data, status, xhr)
+			{
+				alert('something went wrong: ' +data.responseText);
+				console.log(data);
+				console.log(status);
+				console.log(xhr);
+				$("#sub")[0].innerHTML = "Submit Job";
+				$("#sub")[0].disabled = false;
+			}
+		});
+	}
+    
+   // begin vomited jquery code.
+	$(function() {
+    var  tips = $( ".validateTips" );
+ 
+    function updateTips( t ) {
+      tips
+        .text( t )
+        .addClass( "ui-state-highlight" );
+      setTimeout(function() {
+        tips.removeClass( "ui-state-highlight", 1500 );
+      }, 500 );
+    }
+ 
+    function checkRegexp( o, regexp, n ) {
+      if ( !( regexp.test( o.val() ) ) ) {
+        o.addClass( "ui-state-error" );
+        updateTips( n );
+        return false;
+      } else {
+        return true;
+      }
+    }
+    
+    
+    function checkEqual( n ) {
+      if ($("#password").val() != $("#password_repeat").val()) {
+        $("#password_repeat").addClass( "ui-state-error" );
+        updateTips( n );
+        return false;
+      } else {
+        return true;
+      }
+    }
+    
+    $( "#dialog-form" ).dialog({
+      autoOpen: true,
+      height: 450,
+      width: 450,
+      modal: true,
+      buttons: {
+        "Login/Register": function()
+        {
+			//var kcid = $("#kcid")[0].value;
+			
+			$("#kcid").val($("#kcid").val().toUpperCase());
+			
+			if(
+			checkRegexp($("#kcid"), /^KC.+$/, "invalid kcid") &&
+			checkEqual("Passwords don't match!") )
+			{
+				
+			
+				setUpEverything($("#kcid").val(), $("#password").val());
+			
+				
+				$( this ).dialog( "close" );
+			}
+         
+        }
+      }
+    });
+    
+	});
+    
+    
     
     $("#sub").click(function()
     {
@@ -90,18 +266,43 @@ MAIN CSECT
 		
 		$.ajax('./srcprocs/JESProc/jobs', 
 		{	type: "POST",
-			data: {action: "submit", files: [{path:"test.jcl", data: editor.getValue()}], "options": {"username": $("#mar_username")[0].value, "password": $("#mar_password")[0].value}},
+			headers: { "Authorization" : "Basic " + window.btoa(credentials.username + ":" + credentials.password) },
+			data: {action: "submit", files: [{path:"test.jcl", data: editor.getValue()}]},
 			success: function(data, status, xhr)
 			{
 				console.log(data);
 				console.log(data.output);
-				editor2.setValue(data.files[0].data);
+				
+				if (/530 PASS command failed/.test(data.output))
+				{
+					alert('Looks like marist rejected your password.\nIf you entered your username correctly('+credentials.username+'), you\'ll need to have us reset your WebJCL account...');
+				}
+				
+				if (/550 No jobs found/.test(data.output))
+				{
+					alert('Looks like marist can\'t find your job.. this is probably a problem with your KCid in the JCL');
+				}
+					
+				
+				output.setValue(data.outputFiles[0].data);
 				
 				$("#sub")[0].innerHTML = "Submit Job";
 				$("#sub")[0].disabled = false;
 				
+				pollForJobs();
+				
+			},
+			
+			error: function(data, status, xhr)
+			{
+				alert('something went wrong: ' +data.responseText);
+				console.log(data);
+				console.log(status);
+				console.log(xhr);
+				$("#sub")[0].innerHTML = "Submit Job";
+				$("#sub")[0].disabled = false;
 			}
-		})
+		});
 			
 		
 	});
