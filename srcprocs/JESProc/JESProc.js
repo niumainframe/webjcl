@@ -14,7 +14,7 @@
 
 var os = require('os');
 
-var config = require('./config.json');
+var config = require('./config.js');
 var JobSet = require('./JobSet.js');
 var ISrcProc = require('../../framework/ISrcProc.js');
 var ISrcProcJob = require('../../framework/ISrcProcJob.js');

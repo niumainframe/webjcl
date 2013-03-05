@@ -3,7 +3,7 @@ var mongodb = require('../../mongo.js');
 var ObjectId = require('mongodb').ObjectID
 var async = require('async');
 
-var config = require('./config.json');
+var config = require('./config.js');
 
 var ISrcProcJob = require('../../framework/ISrcProcJob.js');
 

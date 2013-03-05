@@ -1,3 +1,4 @@
+var config = 
 {
 	"host": "",
 	
@@ -5,3 +6,5 @@
 	"resTimeout": 5,
 	"workerTimeout": 20 
 }
+
+module.exports = config

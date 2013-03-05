@@ -4,7 +4,7 @@ var path = require('path');
 var uuid = require('node-uuid');
 var spawn = require('child_process').spawn;
 var async = require('async');
-var config = require('./config.json');
+var config = require('./config.js');
 
 
 
