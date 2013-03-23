@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+<title>Web JCL</title>
+<link rel="stylesheet" type="text/css" href="css/reset.css">
+<link rel="stylesheet" type="text/css" href="css/main.css">
+<link rel="stylesheet" type="text/css" href="css/ace.css">
+<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="css/jquery-ui-1.10.1.custom.css">
+</head>
+<body>
+	<div id="header">
+		<ul id="menu">
+			<li class="toggled">
+				<button id="account"><i class="icon-key"></i> Account</button>
+				<ul id="accountDropdown" class="form_container">
+					<li>
+						<label>Marist ID</label>
+						<input id="mar_username" type="text"/>
+					</li>					
+					<li>
+						<label>Password</label>
+						<input id="mar_password" type="password"/>
+					</li>
+				</ul>
+			</li><li>
+			<button id="submit" autocomplete="off"><i class="icon-play"></i> Submit</button></li>
+		</ul>
+	</div>
+	<div id="contentSpace">
+		<div class="window ui-layout-west">
+			<div class="panel"></div>
+		</div>
+		<div class="window ui-layout-center">
+			<div class="panel">
+				<div class="panelBox codeBox" id="code">
+					<div class="header">
+						<h1>Code</h1>
+					</div>
+					<div class="body">
+						<div class="tabs">
+							<ul>
+								<li class="selected"><a>Tab</a></li>
+							</ul>
+						</div>
+						<div class="content">
+							<div id="editor" class="textEditor"> 
+							</div>
+							<ul id="inputStorage" class="tabStorage">
+								<li id="input-1">
+//KC03F57A JOB ,'WebJCL',MSGCLASS=H                           
+//STEP1 EXEC PGM=ASSIST                                                 
+//STEPLIB DD DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                        
+//SYSPRINT DD SYSOUT=*                                                  
+//SYSIN DD *
+*-------------------------------------------
+* WebJCL Demo
+*-------------------------------------------
+*                           
+MAIN CSECT                                                           
+		  USING MAIN,15
+		  L     4,=F'32'
+		  XDUMP
+		  BR    14
+		  END   MAIN                                                     
+/*                                                                      
+//  
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="window ui-layout-east">
+			<div class="panel">
+				<div class="panelBox codeBox" id="code">
+					<div class="header">
+						<h1>Output</h1>
+					</div>
+					<div class="body">
+						<div class="tabs">
+							<ul id="outputTabs">
+								<li class="selected" id="outputTab-1" data-id="1"><a>Output 1</a></li>
+							</ul>
+						</div>
+						<div class="content">
+							<div id="output" class="textEditor">
+							</div>
+							<ul id="outputStorage" class="tabStorage">
+								<li id="output-1">
+Welcome to the prototype of WebJCL - this demonstrates a JCL JobProcessor 
+accessible via REST. This page POSTs the contents of the left pane to
+the /srcprocs/JESPrc/jobs resource. Lots of API documentation will 
+have to be revised in the next coming days.
+
+Output will show up here, but there is also some submission logging 
+in the browser console.
+
+Currently there are many things hard coded in the server in such like 
+username, password, and file names.
+
+
+Bug:  There is an asynchronous bug where sometimes sending the job fails (no such file or directory.)  
+This is because of some of the highly asynchronous nature of Node that I have been sloppy with.
+Just try it again.
+
+Client Implementation: Currently this thrown together webpage does not handle
+the case where the job takes too long while sumitting to Marist: it will fail (see console)
+and require a refresh.
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="js/ace/ace.js" charset="utf-8"></script>
+	<script src="js/jquery-1.9.1.js"></script>
+	<script src="js/jquery-ui-1.10.1.custom.js"></script>
+	<script src="js/jquery.layout.min.js"></script>
+	<script src="js/main.js"></script>
+</body>
+</html>
