@@ -53,32 +53,29 @@ var submitJob = function(){
 	
 	$.ajax('./srcprocs/JESProc/jobs', {	
 		type: "POST",
+		headers: { "Authorization" : "Basic " + window.btoa(user + ":" + pass) },
 		data: {
 			action: "submit", 
 			files: [{
 				path:"test.jcl", 
 				data: editor.getValue()
-			}], 
-			options: {
-				username: user,
-				password: pass
-			}},
+			}]},
 		success: function(data, status, xhr)
 		{
 			console.log(data);
 			console.log(data.output);
-			newOutput(data.files[0].data)
+			newOutput(data.outputFiles[0].data);
 			
 			$("#submit").removeAttr("disabled").find('i').addClass('icon-play').removeClass('icon-spinner').removeClass('icon-spin');
 		}
 	});
 };
 
-var newOutput = function(output){
+var newOutput = function(output_text){
 	$('#outputStorage').append('<li id="output-' + OUTPUT_COUNT + '>' + output + '<li>');
 	$('#outputTabs').append('<li id="outputTab-' + OUTPUT_COUNT + ' data-id="' + OUTPUT_COUNT + '">Output ' + OUTPUT_COUNT + '<li>');
 	OUTPUT_COUNT++;
-	output.setValue($('#output-' + OUTPUT_COUNT).text());
+	output.setValue(output_text);
 	$('#outputTabs > li.selected').removeClass('selected');
 	$('#output-' + OUTPUT_COUNT).addClass('selected')
 }
