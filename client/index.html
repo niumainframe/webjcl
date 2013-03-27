@@ -172,6 +172,7 @@ MAIN CSECT
 		
 		$.ajax('./srcprocs/JESProc/jobs/'+id, 
 		{	type: "GET",
+			dataType: "json",
 			headers: { "Authorization" : "Basic " + window.btoa(credentials.username + ":" + credentials.password) },
 			success: function(data, status, xhr)
 			{

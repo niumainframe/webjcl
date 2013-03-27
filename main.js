@@ -379,8 +379,26 @@ app.get('/srcprocs/:instance/jobs/:jobid', function(req, res)
 			
 			// Otherwise, send job.
 			else
-				res.json(job);
-			
+			{
+				
+				res.format(
+				{
+					'text/plain': function()
+					{
+						// Send output file data of the job.
+						res.send(job.outputFiles[0].data);
+					},
+
+					'application/json': function()
+					{
+						// Send all job info as json.
+						res.json(job);
+					}
+					
+				});
+				
+				
+			}
 		});
 		
 		
