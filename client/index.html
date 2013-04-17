@@ -1,315 +1,112 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
 <head>
-<title>WebJCL</title>
-<style type="text/css" media="screen">
-	
-	body {
-		margin:0;
-	}
-	
-    #editor, #output { 
-	
-	float:left;
-	height:90%;
-    }
-    
-    #editor {
-		
-		width:35%;
-		
-		
-	}
-    
-    #output {
-		width:65%;
-		margin-left:35%;
-		
-	}
-	
-	#options {
-		
-		
-	}
-    
-    
-</style>
-	<link href="css/ui-lightness/jquery-ui-1.10.1.custom.css" rel="stylesheet">
-	<script src="js/jquery-1.9.1.js"></script>
-	<script src="js/jquery-ui-1.10.1.custom.js"></script>
+<title>Web JCL</title>
+<link rel="stylesheet" type="text/css" href="css/reset.css">
+<link rel="stylesheet" type="text/css" href="css/main.css">
+<link rel="stylesheet" type="text/css" href="css/ace.css">
+<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="css/jquery-ui-1.10.1.custom.css">
 </head>
 <body>
-<div style="width:100%;height:10%;">
-	WebJCL Alpha Test | <button id="sub">Submit Job</button> Previous Jobs: <select id="jobs"></select> 
-	<iframe src="http://ghbtns.com/github-btn.html?user=niumainframe&repo=webjcl&type=watch&count=true"
-	allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-</div>
-<div id="editor">
-//KC03F57A JOB ,'WebJCL',MSGCLASS=H                           
-//STEP1 EXEC PGM=ASSIST                                                 
-//STEPLIB DD DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                        
-//SYSPRINT DD SYSOUT=*                                                  
-//SYSIN DD *
-*-------------------------------------------
-* WebJCL Demo
-*-------------------------------------------
-*                           
-MAIN CSECT                                                           
-          USING MAIN,15
-          L     4,=F'32'
-          XDUMP
-          BR    14
-          END   MAIN                                                     
-/*                                                                      
-//   
-</div>
-
-<div id="output">
-	
-</div>
-
-
-<div id="dialog-form" title="Your marist credentials">
-  <p class="validateTips">
-	  <strong>Make sure to type in your marist password correctly.</strong>  We haven't built a password reset yet.<br/><br/>
-	  This will save your last 5 jobs, but make sure to copy/paste your code out occasionally in case it blows up.
-  </p>
- 
-  <form>
-  <fieldset>
-    KC-ID
-    <input type="text" name="KCID" id="kcid" class="text ui-widget-content ui-corner-all" /><br/>
-    Password:
-    <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all"  /><br/>
-    <label for="password">Password (repeat):</label>
-    <input type="password" name="password_repeat" id="password_repeat" class="text ui-widget-content ui-corner-all" />
-  </fieldset>
-  </form>
-</div>
-
-<script src="js/ace.js" type="text/javascript" charset="utf-8"></script>
-<script>
-    var editor = ace.edit("editor");
-    var output = ace.edit("output");
-    
-    var credentials = {};
-    
-    
-    
-    $("select#jobs").change(function(){
-		getJob($(this).children(":selected").attr("id"));
-	});
-    
-    
-    function pollForJobs(first)
-    {
-		
-		$.ajax('./srcprocs/JESProc/jobs', 
-		{	type: "GET",
-			headers: { "Authorization" : "Basic " + window.btoa(credentials.username + ":" + credentials.password) },
-			success: function(data, status, xhr)
-			{
-				console.log(data);
-				
-				$("#jobs")[0].innerHTML = "";
-				
-				for (j in data)
-				{
-					
-					var job = document.createElement("option");
-					job.setAttribute('id', data[j].id);
-					job.innerHTML = data[j].time;
-					
-					$(job).change(function()
-					{
-						getJob(data[j].id);
-					});
-					
-					$("#jobs").append(job);
-					
-					
-				}
-				
-				if (first != undefined) {
-					if ($("#jobs").children().length != 0) {
-					getJob($("#jobs").children().attr('id'));
-					}
-				}
-				
-				$("#sub")[0].innerHTML = "Submit Job";
-				$("#sub")[0].disabled = false;
-				
-			},
-			
-			error: function(data, status, xhr)
-			{
-				alert('something went wrong: ' +data.responseText);
-				console.log(data);
-				console.log(status);
-				console.log(xhr);
-				$("#sub")[0].innerHTML = "Submit Job";
-				$("#sub")[0].disabled = false;
-			}
-		})
-		
-		
-		
-	}
-    
-    function setUpEverything(username, password)
-    {
-		credentials.username = username;
-		credentials.password = password;
-		
-		pollForJobs(true);
-		
-		
-		
-	}
-	
-	function getJob(id)
-	{
-		
-		$.ajax('./srcprocs/JESProc/jobs/'+id, 
-		{	type: "GET",
-			dataType: "json",
-			headers: { "Authorization" : "Basic " + window.btoa(credentials.username + ":" + credentials.password) },
-			success: function(data, status, xhr)
-			{
-				console.log(data);
-				
-				editor.setValue(data.files[0].data);
-				output.setValue(data.outputFiles[0].data);
-				
-				
-				
-			},
-			error: function(data, status, xhr)
-			{
-				alert('something went wrong: ' +data.responseText);
-				console.log(data);
-				console.log(status);
-				console.log(xhr);
-				$("#sub")[0].innerHTML = "Submit Job";
-				$("#sub")[0].disabled = false;
-			}
-		});
-	}
-    
-   // begin vomited jquery code.
-	$(function() {
-    var  tips = $( ".validateTips" );
- 
-    function updateTips( t ) {
-      tips
-        .text( t )
-        .addClass( "ui-state-highlight" );
-      setTimeout(function() {
-        tips.removeClass( "ui-state-highlight", 1500 );
-      }, 500 );
-    }
- 
-    function checkRegexp( o, regexp, n ) {
-      if ( !( regexp.test( o.val() ) ) ) {
-        o.addClass( "ui-state-error" );
-        updateTips( n );
-        return false;
-      } else {
-        return true;
-      }
-    }
-    
-    
-    function checkEqual( n ) {
-      if ($("#password").val() != $("#password_repeat").val()) {
-        $("#password_repeat").addClass( "ui-state-error" );
-        updateTips( n );
-        return false;
-      } else {
-        return true;
-      }
-    }
-    
-    $( "#dialog-form" ).dialog({
-      autoOpen: true,
-      height: 450,
-      width: 450,
-      modal: true,
-      buttons: {
-        "Login/Register": function()
-        {
-			//var kcid = $("#kcid")[0].value;
-			
-			$("#kcid").val($("#kcid").val().toUpperCase());
-			
-			if(
-			checkRegexp($("#kcid"), /^KC.+$/, "invalid kcid") &&
-			checkEqual("Passwords don't match!") )
-			{
-				
-			
-				setUpEverything($("#kcid").val(), $("#password").val());
-			
-				
-				$( this ).dialog( "close" );
-			}
-         
-        }
-      }
-    });
-    
-	});
-    
-    
-    
-    $("#sub").click(function()
-    {
-		$("#sub")[0].innerHTML = "Waiting for server response...";
-		$("#sub")[0].disabled = true;
-		
-		$.ajax('./srcprocs/JESProc/jobs', 
-		{	type: "POST",
-			headers: { "Authorization" : "Basic " + window.btoa(credentials.username + ":" + credentials.password) },
-			data: {action: "submit", files: [{path:"test.jcl", data: editor.getValue()}]},
-			success: function(data, status, xhr)
-			{
-				console.log(data);
-				console.log(data.output);
-				
-				if (/530 PASS command failed/.test(data.output))
-				{
-					alert('Looks like marist rejected your password.\nIf you entered your username correctly('+credentials.username+'), you\'ll need to have us reset your WebJCL account...');
-				}
-				
-				if (/550 No jobs found/.test(data.output))
-				{
-					alert('Looks like marist can\'t find your job.. this is probably a problem with your KCid in the JCL');
-				}
-					
-				
-				output.setValue(data.outputFiles[0].data);
-				
-				$("#sub")[0].innerHTML = "Submit Job";
-				$("#sub")[0].disabled = false;
-				
-				pollForJobs();
-				
-			},
-			
-			error: function(data, status, xhr)
-			{
-				alert('something went wrong: ' +data.responseText);
-				console.log(data);
-				console.log(status);
-				console.log(xhr);
-				$("#sub")[0].innerHTML = "Submit Job";
-				$("#sub")[0].disabled = false;
-			}
-		});
-			
-		
-	});
-    
-</script>
+	<div id="header">
+		<ul id="menu">
+			<li>
+				<button id="ide" disabled autocomplete="off"><i class="icon-wrench"></i> IDE</button>
+			</li>
+			<li>
+				<button id="account" class="selected" autocomplete="off"><i class="icon-key"></i> Account</button>
+			</li>
+			<li>
+				<button id="feedback" autocomplete="off"><i class="icon-bullhorn"></i> Feedback</button>
+			</li>
+		</ul>
+	</div>
+	<div id="account-page" class="page">
+		<form id="accountForm">
+			<ul>
+				<li>
+					<h1>Account</h1>
+				</li>
+				<li>
+					<label>Marist Account</label>
+					<input id="username" autocomplete="off" type="text"/>
+				</li>			
+				<li>
+					<label>Password</label>
+					<input id="password" autocomplete="off" type="password"/>
+				</li>				
+				<li>
+					<button id="saveAccount" autocomplete="off">Save</button>
+					<button id="changeAccount" autocomplete="off" disabled>Change</button>
+				</li>
+			</ul>
+		</form>
+	</div>
+	<div id="feedback-page" class="page">
+		<iframe id="feedbackFrame" src="https://docs.google.com/forms/d/1BjYUvh-jaiwl62cTl_t2A8OMScvC41e-0biFJ2WkhT4/viewform"></iframe>
+	</div>
+	<div id="ide-page" class="page">
+		<div id="toolbar">
+			<ul>
+				<li><button autocomplete="off" id="new-button"><i class="icon-file"></i> New</button></li>
+				<li><button autocomplete="off" id="save-button"><i class="icon-save"></i> Save</button></li>
+				<li><button autocomplete="off" id="run-button"><i class="icon-play"></i> Run</button></li>
+			</ul>
+		</div>
+		<div id="contentSpace">
+			<div id="leftWindow" class="window ui-layout-west">
+				<div class="panel"></div>
+			</div>
+			<div id="centerWindow" class="window ui-layout-center">
+				<div class="panel" id="codePanel">
+					<div class="panelBox codeBox" id="code">
+						<div class="header">
+							<h1>Code</h1>
+						</div>
+						<div class="body">
+							<div class="tabsContainer">
+								<ul class="tabs" id="codeTab">
+									<!--<li class="selected"><a>Tab</a></li>-->
+								</ul>
+							</div>
+							<div class="content">
+								<ul class="textSpace">
+								
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="rightWindow" class="window ui-layout-east">
+				<div class="panel" id="outputPanel">
+					<div class="panelBox codeBox" id="code">
+						<div class="header">
+							<h1>Output</h1>
+						</div>
+						<div class="body">
+							<div class="tabsContainer">
+								<ul class="tabs" id="outputTab">
+								</ul>
+							</div>
+							<div class="content">
+								<ul class="textSpace">
+								
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="js/ace/ace.js" charset="utf-8"></script>
+	<script src="js/jquery-1.9.1.js"></script>
+	<script src="js/jquery-ui-1.10.1.custom.js"></script>
+	<script src="js/jquery.layout.min.js"></script>
+	<script src="js/jquery.mousewheel.min.js"></script>
+	<script src="js/main.js"></script>
+	<script src="js/textobject.js"></script>
 </body>
 </html>
