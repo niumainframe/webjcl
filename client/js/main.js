@@ -142,7 +142,8 @@ var submitJob = function(){
 		function(id, output, meta) {
 			
 			var index = outputPTO.createTextObject('Output');
-			outputPTO.getByIndex(index).setValue(output);
+			var o = outputPTO.getByIndex(index);
+			o.editor.setValue(output);
 			
 			// Restore button
 			$('#run-button').removeAttr('disabled').find('i').addClass('icon-play').removeClass('icon-spinner').removeClass('icon-spin');

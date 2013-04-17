@@ -41,12 +41,12 @@ TextObjectManager.prototype.createTextObject = function(name){
 	this.__activeTab = this.__TextObjectArray[this.__TextObjectIndex];
 	this.__TextObjectIndex++;
 	
-	return this._TextObjectIndex;
+	return this.__TextObjectIndex;
 }
 
 //Returns the TO via the index number in the array object.
 TextObjectManager.prototype.getByIndex = function(index){
-	return this.__TextObjectArray[index];
+	return this.__TextObjectArray[index-1];
 }
 
 //Returns the active TO.
