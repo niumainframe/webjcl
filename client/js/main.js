@@ -5,6 +5,8 @@ var password = '';
 var codePTO;
 var outputPTO;
 
+var jclProcessor = new JCLProcessor();
+
 $(document).ready(function(){
 	$('#ide-page').show();
 	$('#contentSpace').layout({
@@ -120,6 +122,11 @@ var submitJob = function(){
 		return;
 	}
 	
+
+	
+	jclProcessor.username = username;
+	jclProcessor.password = password;
+	
 	var textObject = codePTO.getActive();
 	if(!textObject){
 		alert("You must have an active tab in order to run a program.");
@@ -130,25 +137,27 @@ var submitJob = function(){
 	
 	$('#run-button').attr('disabled', 'disabled').find('i').removeClass('icon-play').addClass('icon-spinner').addClass('icon-spin');
 	
-	$.ajax('./srcprocs/JESProc/jobs', {	
-		type: "POST",
-		headers: { "Authorization" : "Basic " + window.btoa(username + ":" + password) },
-		data: {
-			action: "submit", 
-			files: [{
-				path:"test.jcl", 
-				data: text
-			}]},
-		success: function(data, status, xhr)
-		{
-			console.log(data);
-			console.log(data.output);
-			var index = outputPTO.createTextObject('Output');
-			outputPTO.getByIndex(index).setValue(data.outputFiles[0].data);
+	jclProcessor.sendJob(text,
+		// Success callback
+		function(id, output, meta) {
 			
+			var index = outputPTO.createTextObject('Output');
+			outputPTO.getByIndex(index).setValue(output);
+			
+			// Restore button
 			$('#run-button').removeAttr('disabled').find('i').addClass('icon-play').removeClass('icon-spinner').removeClass('icon-spin');
-		}
-	});
+			
+		},
+		
+		// Error callback
+		function(errMsg, data) {
+			
+			alert(errMsg);
+			console.log(data);
+			// Restore button
+			$('#run-button').removeAttr('disabled').find('i').addClass('icon-play').removeClass('icon-spinner').removeClass('icon-spin');
+		
+		});
 };
 
 var newOutput = function(output){
