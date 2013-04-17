@@ -385,6 +385,9 @@ app.get('/srcprocs/:instance/jobs/:jobid', function(req, res)
 				{
 					'text/plain': function()
 					{
+						// Suggest that this file be downloaded and not displayed in the browser.
+						res.header('Content-Disposition', 'attachment; filename="job-output.txt"');
+						
 						// Send output file data of the job.
 						res.send(job.outputFiles[0].data);
 					},
