@@ -58,6 +58,12 @@ JCLProcessor.prototype =
 					error('Looks like marist rejected your password. If you entered your username correctly ('+self.username+'), you\'ll need to have an administrator reset your WebJCL account...');
 					return;
 				}
+				
+				else if (/file not accepted by JES/.test(data.output))
+				{
+					error('JES rejected your job.. this is probably because of bad JCL.');
+					return;
+				}
 
 				else if (/550 No jobs found/.test(data.output))
 				{
