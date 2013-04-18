@@ -147,7 +147,23 @@ $(document).ready(function(){
 	$('#new-button').click(function(e){
 		codePTO.createTextObject('Program');
 	});
+	
+	$('#save-output-button').click(function(e){
+
+		downloadActiveTO(outputPTO);
+		
+	});
+	
+	$('#save-code-button').click(function(e){
+
+		downloadActiveTO(codePTO);
+		
+	});
+	
 });
+
+
+
 
 var submitJob = function(){
 	if(username == '' || password == ''){
@@ -201,4 +217,56 @@ var newOutput = function(output){
 	output.setValue($('#output-' + OUTPUT_COUNT).text());
 	$('#outputTabs > li.selected').removeClass('selected');
 	$('#output-' + OUTPUT_COUNT).addClass('selected')
+}
+
+/**
+ * getTextDownloadURL
+ * 
+ * Given a string of text, this will produce a local URL to where the text can
+ * be downloaded.
+ * 
+ * @param string text
+ * 	The text to be made available by local URL.
+ * 
+ */
+var getTextDownloadURL = function(text){
+	
+	// Split text into a character array.
+	text = text.split('');
+	
+	// Create the blob of the code.
+	var blob = new Blob(text, {type: "application/octet-stream"});
+	
+	// Obtian URL to the blob.
+	var fileURL = window.URL.createObjectURL(blob);
+	
+	return fileURL;
+	
+}
+
+/**
+ * downloadActiveTO
+ * 
+ * This will present a download prompt to download the contents of the 
+ * currently active TO from the specified TO manager.  It currently doesn't
+ * do anything if there is no active TO.
+ * 
+ * @param TextObjectManager manager
+ * 	Instance of a TextObjectManager
+ * 
+ */
+var downloadActiveTO = function(manager) {
+	
+	var textObject = manager.getActive()
+	
+	// Quit if there is no active text object.
+	if(!textObject)
+		return false;
+	
+	// Obtain the text of the output.
+	var text = textObject.editor.getValue();
+	
+	// Navigate browser to the URL of the text.
+	window.location = getTextDownloadURL(text);
+	
 }
