@@ -78,9 +78,42 @@ $(document).ready(function(){
 		}
 		username = $('#username').attr('disabled','disabled').val();
 		password = $('#password').attr('disabled','disabled').val();
+		
+		// Configure jclProcessor
+		jclProcessor.username = username;
+		jclProcessor.password = password;
+		
 		$('#ide').removeAttr('disabled');
 		$(this).attr('disabled','disabled');
 		$('#changeAccount').removeAttr('disabled');
+		
+		// Obtain the jobs.
+		jclProcessor.listJobs(
+			function(jobs) {
+				
+				for(var i = jobs.length-1; i >= 0; i--) {
+					
+					jclProcessor.retrieveJob(jobs[i].id, 
+					
+						function(output, sub, meta){
+							
+							var index = codePTO.createTextObject('Saved');
+							codePTO.getByIndex(index).editor.setValue(sub);
+							
+						});
+					
+				}
+					
+			});
+		
+		// Switch to IDE section by clicking it's button.
+		var ideBtn = document.getElementById("ide");
+		if (typeof ideBtn.onclick == "function") {
+			ideBtn.onclick.apply(ideBtn);
+		}
+		
+		ideBtn.click();
+		
 	});	
 	
 	$('#changeAccount').click(function(e){
