@@ -178,6 +178,38 @@ JCLProcessor.prototype =
 	
 	},
 	
+	listJobs: function(success, error)
+	{
+		
+		$.ajax('./srcprocs/JESProc/jobs',
+		{
+			type: "GET",
+			dataType: "json",
+			headers: { "Authorization" : "Basic " + 
+					   window.btoa(self.username + ":" + 
+					   self.password) },
+			
+			success: function(data, status, xhr)
+			{
+				
+				success(data);
+				
+			},
+			
+			error: function(data, status, xhr)
+			{
+					
+					self._handleUnauthorizedError(data, status, xhr, error) ||
+					
+					self._handleDefaultAjaxError(data, status, xhr, error);
+					
+			}
+			
+		});
+		
+		
+	},
+	
 	/**
 	 * private _handleDefaultAjaxError method
 	 * 
