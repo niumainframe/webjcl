@@ -59,6 +59,12 @@ JCLProcessor.prototype =
 					return;
 				}
 				
+				else if (/Connection timed out/.test(data.output))
+				{
+					error('It appears that the mainframe is unreachable via FTP.');
+					return;
+				}
+				
 				else if (/file not accepted by JES/.test(data.output))
 				{
 					error('JES rejected your job.. this is probably because of bad JCL.');
@@ -180,6 +186,7 @@ JCLProcessor.prototype =
 	
 	listJobs: function(success, error)
 	{
+		var self = this;
 		
 		$.ajax('./srcprocs/JESProc/jobs',
 		{
@@ -246,7 +253,8 @@ JCLProcessor.prototype =
 		// Case: invalid credentials
 		if (data.status == 403 || data.status == 401)
 		{
-			err_callback("Invalid login information. Contact an administrator to reset.",
+			err_callback("Invalid login information. If you are certain that your credentials are correct, " 
+			             +"you must contact an administrator to reset your WebJCL account.",
 				  { "data" : data, "status" : status, "xhr" : xhr});
 				  
 			return true;
@@ -256,7 +264,8 @@ JCLProcessor.prototype =
 		
 	}
 	
-	// This would be nice.
+	// This would be nice.  Right now some sorts of this functionality is 
+	// handled upon registration on the server side... and it's messy.
 	//validateCredentials: function (success, error) {}
 	
 }
