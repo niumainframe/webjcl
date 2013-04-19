@@ -1,5 +1,6 @@
 var mongo = require('./mongo.js');
 var crypto = require('crypto');
+var ftp = require("ftp");
 
 
 
@@ -64,15 +65,32 @@ var Authenticator =
 					callback(err, false);
 					return;
 				}
-					
-				// Otherwise, happily insert the username/password.	
-				coll.insert({ username: username, 
-							  password: self.hashPass(password)}, function(err, result)
+				
+				// TODO: THIS IS OUT OF PLACE.
+				// The structure of the authentication system probably needs to
+				// be rethunk.  Also the 
+				ftpClient = new ftp();
+				jesConf = require('./srcprocs/JESProc/config.js');
+				ftpClient.connect({"host": jesConf.host, "user": username, "password": password});
+				
+				ftpClient.on('ready', function()
 				{
+					ftpClient.end();
 					
+					// Otherwise, happily insert the username/password.	
+					coll.insert({ username: username, 
+								  password: self.hashPass(password)}, function(err, result)
+					{
+						callback(err, true);
+										   
+					});
 					
-					callback(err, true);
-									   
+				});
+				
+				ftpClient.on('error', function()
+				{
+					callback(err, false);
+					return;
 				});
 				
 				
