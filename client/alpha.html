@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>WebJCL</title>
+<style type="text/css" media="screen">
+	
+	body {
+		margin:0;
+	}
+	
+    #editor, #output { 
+	
+	float:left;
+	height:90%;
+    }
+    
+    #editor {
+		
+		width:35%;
+		
+		
+	}
+    
+    #output {
+		width:65%;
+		margin-left:35%;
+		
+	}
+	
+	#options {
+		
+		
+	}
+    
+    
+</style>
+	<link href="css/ui-lightness/jquery-ui-1.10.1.custom.css" rel="stylesheet">
+	<script src="js/jquery-1.9.1.js"></script>
+	<script src="js/jquery-ui-1.10.1.custom.js"></script>
+	<script src="js/JCLProcessor.js"></script>
+</head>
+<body>
+<div style="width:100%;height:10%;">
+	WebJCL Alpha Test | <button id="sub">Submit Job</button> Previous Jobs: <select id="jobs"></select> 
+	<iframe src="http://ghbtns.com/github-btn.html?user=niumainframe&repo=webjcl&type=watch&count=true"
+	allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+</div>
+<div id="editor">
+//KC03F57A JOB ,'WebJCL',MSGCLASS=H                           
+//STEP1 EXEC PGM=ASSIST                                                 
+//STEPLIB DD DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                        
+//SYSPRINT DD SYSOUT=*                                                  
+//SYSIN DD *
+*-------------------------------------------
+* WebJCL Demo
+*-------------------------------------------
+*                           
+MAIN CSECT                                                           
+          USING MAIN,15
+          L     4,=F'32'
+          XDUMP
+          BR    14
+          END   MAIN                                                     
+/*                                                                      
+//   
+</div>
+
+<div id="output">
+	
+</div>
+
+
+<div id="dialog-form" title="Your marist credentials">
+  <p class="validateTips">
+	  <strong>Make sure to type in your marist password correctly.</strong>  We haven't built a password reset yet.<br/><br/>
+	  This will save your last 5 jobs, but make sure to copy/paste your code out occasionally in case it blows up.
+  </p>
+ 
+  <form>
+  <fieldset>
+    KC-ID
+    <input type="text" name="KCID" id="kcid" class="text ui-widget-content ui-corner-all" /><br/>
+    Password:
+    <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all"  /><br/>
+    <label for="password">Password (repeat):</label>
+    <input type="password" name="password_repeat" id="password_repeat" class="text ui-widget-content ui-corner-all" />
+  </fieldset>
+  </form>
+</div>
+
+<script src="js/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+	var jclProcessor = new JCLProcessor();
+    var editor = ace.edit("editor");
+    var output = ace.edit("output");
+    
+    var credentials = {};
+    
+    
+    
+    $("select#jobs").change(function(){
+		getJob($(this).children(":selected").attr("id"));
+	});
+    
+    
+    function pollForJobs(first)
+    {
+		jclProcessor.listJobs(
+			function(data)
+			{
+				console.log(data);
+				
+				$("#jobs")[0].innerHTML = "";
+				
+				for (j in data)
+				{
+					
+					var job = document.createElement("option");
+					job.setAttribute('id', data[j].id);
+					job.innerHTML = data[j].time;
+					
+					$(job).change(function()
+					{
+						getJob(data[j].id);
+					});
+					
+					$("#jobs").append(job);
+					
+					
+				}
+				
+				if (first != undefined) {
+					if ($("#jobs").children().length != 0) {
+					getJob($("#jobs").children().attr('id'));
+					}
+				}
+				
+				$("#sub")[0].innerHTML = "Submit Job";
+				$("#sub")[0].disabled = false;
+				
+			},
+			
+			function(data, status, xhr)
+			{
+				alert('something went wrong: ' +data.responseText);
+				console.log(data);
+				console.log(status);
+				console.log(xhr);
+				$("#sub")[0].innerHTML = "Submit Job";
+				$("#sub")[0].disabled = false;
+			}
+		);
+		
+		
+		
+	}
+    
+    function setUpEverything(username, password)
+    {
+		jclProcessor.username = username;
+		jclProcessor.password = password;
+		
+		pollForJobs(true);
+		
+		
+		
+	}
+	
+	function getJob(id)
+	{
+
+		jclProcessor.retrieveJob(id,
+			function(o, sub, meta)
+			{
+					
+					
+					editor.setValue(sub);
+					output.setValue(o);
+					
+					
+					
+			},
+			function(errMsg, data)
+			{
+				alert('something went wrong: ' +errMsg);
+				console.log(data);
+				$("#sub")[0].innerHTML = "Submit Job";
+				$("#sub")[0].disabled = false;
+			}
+		);
+	}
+    
+   // begin vomited jquery code.
+	$(function() {
+    var  tips = $( ".validateTips" );
+ 
+    function updateTips( t ) {
+      tips
+        .text( t )
+        .addClass( "ui-state-highlight" );
+      setTimeout(function() {
+        tips.removeClass( "ui-state-highlight", 1500 );
+      }, 500 );
+    }
+ 
+    function checkRegexp( o, regexp, n ) {
+      if ( !( regexp.test( o.val() ) ) ) {
+        o.addClass( "ui-state-error" );
+        updateTips( n );
+        return false;
+      } else {
+        return true;
+      }
+    }
+    
+    
+    function checkEqual( n ) {
+      if ($("#password").val() != $("#password_repeat").val()) {
+        $("#password_repeat").addClass( "ui-state-error" );
+        updateTips( n );
+        return false;
+      } else {
+        return true;
+      }
+    }
+    
+    $( "#dialog-form" ).dialog({
+      autoOpen: true,
+      height: 450,
+      width: 450,
+      modal: true,
+      buttons: {
+        "Login/Register": function()
+        {
+			//var kcid = $("#kcid")[0].value;
+			
+			$("#kcid").val($("#kcid").val().toUpperCase());
+			
+			if(
+			checkRegexp($("#kcid"), /^KC.+$/, "invalid kcid") &&
+			checkEqual("Passwords don't match!") )
+			{
+				
+			
+				setUpEverything($("#kcid").val(), $("#password").val());
+			
+				
+				$( this ).dialog( "close" );
+			}
+         
+        }
+      }
+    });
+    
+	});
+    
+    
+    
+    $("#sub").click(function()
+    {
+		$("#sub")[0].innerHTML = "Waiting for server response...";
+		$("#sub")[0].disabled = true;
+		
+		jclProcessor.sendJob(editor.getValue(),
+			function(id, o, meta)
+			{
+				console.log(id);
+				console.log(o);
+				console.log(meta);
+				output.setValue(o);
+				
+				$("#sub")[0].innerHTML = "Submit Job";
+				$("#sub")[0].disabled = false;
+				
+				pollForJobs();
+				
+			},
+			
+			function(errMsg, data)
+			{
+				alert(errMsg);
+				console.log(data);
+				$("#sub")[0].innerHTML = "Submit Job";
+				$("#sub")[0].disabled = false;
+			}
+		);
+			
+		
+	});
+    
+</script>
+</body>
+</html>
