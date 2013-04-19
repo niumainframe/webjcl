@@ -55,29 +55,25 @@ var Authenticator =
 		mongo.collection(self.collection, function(err, coll)
 		{
 			
-			// Check to see if the username already exists.
-			coll.findOne({ username: username }, function(err, result)
+			// Drop any entry of the username in the table.
+			coll.remove({ username: username }, function(err, result)
 			{
 				
-				// If this is the case, then return false.
-				if (result)
-				{
-					callback(err, false);
-					return;
-				}
-				
+				// Verify that the credentials match the ones on marist.
 				// TODO: THIS IS OUT OF PLACE.
 				// The structure of the authentication system probably needs to
-				// be rethunk.  Also the 
+				// be rethunk.
 				ftpClient = new ftp();
 				jesConf = require('./srcprocs/JESProc/config.js');
 				ftpClient.connect({"host": jesConf.host, "user": username, "password": password});
 				
+				// CASE: successful login
 				ftpClient.on('ready', function()
 				{
+					// close ftp connection
 					ftpClient.end();
 					
-					// Otherwise, happily insert the username/password.	
+					// Happily insert the username/password into our database.
 					coll.insert({ username: username, 
 								  password: self.hashPass(password)}, function(err, result)
 					{
@@ -87,6 +83,7 @@ var Authenticator =
 					
 				});
 				
+				// CASE: login  failed.
 				ftpClient.on('error', function()
 				{
 					callback(err, false);

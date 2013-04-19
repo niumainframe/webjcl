@@ -55,7 +55,7 @@ JCLProcessor.prototype =
 				// Handle successful HTTP responses that indicate error.
 				if (/530 PASS command failed/.test(data.output))
 				{
-					error('Looks like marist rejected your password. If you entered your username correctly ('+self.username+'), you\'ll need to have an administrator reset your WebJCL account...');
+					error('The mainframe rejected your credentials.  Please reenter them and try again.');
 					return;
 				}
 				
@@ -67,7 +67,7 @@ JCLProcessor.prototype =
 				
 				else if (/file not accepted by JES/.test(data.output))
 				{
-					error('JES rejected your job.. this is probably because of bad JCL.');
+					error('JES rejected your job.. this may be because of a bad JCL header.');
 					return;
 				}
 
@@ -253,8 +253,7 @@ JCLProcessor.prototype =
 		// Case: invalid credentials
 		if (data.status == 403 || data.status == 401)
 		{
-			err_callback("Invalid login information. If you are certain that your credentials are correct, " 
-			             +"you must contact an administrator to reset your WebJCL account.",
+			err_callback("Your login information is not valid. Did you recently update your mainframe password?",
 				  { "data" : data, "status" : status, "xhr" : xhr});
 				  
 			return true;
