@@ -89,21 +89,43 @@ $(document).ready(function(){
 		
 		// Obtain the jobs.
 		jclProcessor.listJobs(
+			
+			// Success
 			function(jobs) {
 				
+				// For each job...
 				for(var i = jobs.length-1; i >= 0; i--) {
 					
 					jclProcessor.retrieveJob(jobs[i].id, 
 					
+						// Success
 						function(output, sub, meta){
 							
+							// Place output in a new tab.
 							var index = codePTO.createTextObject('Saved');
 							codePTO.getByIndex(index).editor.setValue(sub);
+							
+						},
+						
+						// Error
+						function(errMsg, data) {
+							
+							alert(errMsg);
+							console.log(data);
+							
 							
 						});
 					
 				}
 					
+			},
+			
+			// listJobs error.
+			function(errMsg, data) {
+				
+				alert(errMsg);
+				console.log(data);
+				
 			});
 		
 		// Switch to IDE section by clicking it's button.
@@ -172,7 +194,7 @@ var submitJob = function(){
 	}
 	
 
-	
+	// Set credentials.
 	jclProcessor.username = username;
 	jclProcessor.password = password;
 	
@@ -186,17 +208,27 @@ var submitJob = function(){
 	
 	$('#run-button').attr('disabled', 'disabled').find('i').removeClass('icon-play').addClass('icon-spinner').addClass('icon-spin');
 	
+	
 	jclProcessor.sendJob(text,
 		// Success callback
 		function(id, output, meta) {
 			
-			var index = outputPTO.createTextObject('Output');
-			var o = outputPTO.getByIndex(index);
-			o.editor.setValue(output);
+			// CASE: No Output:
+			if (output == null) {
+				
+				// Begin polling for the job to complete.
+				pollForOutput(id);
+				
+			}
 			
-			// Restore button
-			$('#run-button').removeAttr('disabled').find('i').addClass('icon-play').removeClass('icon-spinner').removeClass('icon-spin');
-			
+			// CASE: We have output!
+			else {
+				// Make a new output text object with the job's contents.
+				makeNewOutputTO(output, 'Output');
+				
+				// Restore button
+				$('#run-button').removeAttr('disabled').find('i').addClass('icon-play').removeClass('icon-spinner').removeClass('icon-spin');
+			}
 		},
 		
 		// Error callback
@@ -207,8 +239,9 @@ var submitJob = function(){
 			// Restore button
 			$('#run-button').removeAttr('disabled').find('i').addClass('icon-play').removeClass('icon-spinner').removeClass('icon-spin');
 		
-		});
-};
+		}); //end jclProcessor.sendJob
+		
+}; //end submitJob(..)
 
 var newOutput = function(output){
 	$('#outputStorage').append('<li id="output-' + OUTPUT_COUNT + '>' + output + '<li>');
@@ -217,6 +250,87 @@ var newOutput = function(output){
 	output.setValue($('#output-' + OUTPUT_COUNT).text());
 	$('#outputTabs > li.selected').removeClass('selected');
 	$('#output-' + OUTPUT_COUNT).addClass('selected')
+}
+
+
+/**
+ * makeNewOutputTO
+ * 
+ * Make new output text object.
+ * 
+ * @param string content
+ * 	The textual content to place in the text object.
+ * @param string name
+ * 	The name of the tab
+ */
+var makeNewOutputTO = function(content, name) {
+	
+	var index = outputPTO.createTextObject(name);
+	var o = outputPTO.getByIndex(index);
+	o.editor.setValue(content);
+	
+}
+
+/**
+ * pollForOutput
+ * 
+ * Given a job ID, this will wait for a period of time and attempt to retrieve
+ * the job.  If the output is null, then it will wait for a period of time and
+ * try again.
+ * 
+ * Upon success it makes a new output pane with the content.
+ * 
+ * Errors are alerted and logged.
+ * 
+ * This function is intended to be used when the job processor returns no output
+ * but the job has been assigned an ID. (Usually this is when the job is taking
+ * too long to process and one should check back later.)
+ * 
+ * @param job_id id
+ * 	The id of the job to retrieve.
+ * 
+ */
+var pollForOutput = function(id) {
+	
+	console.log("Did not receive job immediately.. will poll again soon...");
+	
+	// How many ms should we wait before trying to get the job?
+	var timeout = 5000;
+	
+	// Invoke this function in X ms from now.
+	setTimeout(function() {
+		
+		// Try to get the job.
+		jclProcessor.retrieveJob(id, 
+			
+			// Success case
+			function(output, sub, meta)
+			{
+				
+				if(output == null)
+					// Try again later if still no output.
+					pollForOutput(id);
+				
+				
+				else
+					// Show the output!
+					makeNewOutputTO(output, "Output");
+				
+				// Restore button
+				$('#run-button').removeAttr('disabled').find('i').addClass('icon-play').removeClass('icon-spinner').removeClass('icon-spin');
+				
+			},
+			
+			// Error case
+			function(errMsg, data)
+			{
+				alert(errMsg);
+				console.log(data);
+				
+			});
+		
+	}, timeout);
+	
 }
 
 /**
