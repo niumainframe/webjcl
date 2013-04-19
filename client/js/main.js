@@ -269,6 +269,9 @@ var makeNewOutputTO = function(content, name) {
 	var o = outputPTO.getByIndex(index);
 	o.editor.setValue(content);
 	
+	// make it read only
+	o.editor.setReadOnly(true);
+	
 }
 
 /**
