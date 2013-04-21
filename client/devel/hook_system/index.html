@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>ACE in Action</title>
+<style type="text/css" media="screen">
+    #editor { 
+        position: absolute;
+        height:100%;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+</head>
+<body>
+
+<div id="editor">//KC00F00A JOB ,'WebJCL',MSGCLASS=H                               00010000
+//STEP1 EXEC PGM=ASSIST                                                 00020000
+//STEPLIB DD DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                        00030000
+//SYSPRINT DD SYSOUT=*                                                  00040000
+//SYSIN DD *                                                            00050000
+********************************************                            00060000
+* processing chain demo: invoke test()                                                           00070000
+********************************************                            00080000
+MAIN     CSECT                                                          00090000
+         USING MAIN,15                                                  00100000
+         L     1,N1                                                     00110002
+         L     2,N2                                                     00120002
+         
+         SR    2,1                                                      00121002
+         
+         
+         L     3,N1           Comment                                          00122002
+         L     4,N2                                                     00123002
+         
+         AR    3,4                                                      00124003
+         
+         XDUMP                                                          00130000
+         
+         BR    14                                                       00140000
+N1       DC    F'35'                                                    00141001
+N2       DC    F'27'                                                    00142001
+         END   MAIN                                                     00150000
+/*                                                                      00160000
+//                                                                      00170000
+</div>
+    
+<script src="../../js/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.getSession().setMode("ace/mode/text");
+</script>
+<script src="js/main.js"></script>
+</body>
+</html>
