@@ -383,6 +383,32 @@ var downloadActiveTO = function(manager) {
 	// Obtain the text of the output.
 	var text = textObject.editor.getValue();
 	
+	/* linefeed / line ending fix
+	 * downloaded output does not look formatted correctly on windows. */
+	if (window.navigator.platform.match('Windows'))
+	{
+		// Feed a new string characters from the old string
+		var windowstext = "";
+		for (k in text) 
+		{
+			// If we come across a LF
+			if (text[k] == '\n')
+			{
+				// Feed the new string a CR before the LF.
+				windowstext += '\r';
+				windowstext += '\n';
+			}
+			
+			else
+				windowstext += text[k];
+			
+		}
+		
+		// Replace the old string with the new one.
+		text = windowstext;
+	}
+	
+	
 	// Navigate browser to the URL of the text.
 	window.location = getTextDownloadURL(text);
 	
