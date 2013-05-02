@@ -385,7 +385,7 @@ var downloadActiveTO = function(manager) {
 	
 	/* linefeed / line ending fix
 	 * downloaded output does not look formatted correctly on windows. */
-	if (window.navigator.platform.match('Windows'))
+	if (window.navigator.platform.match('Win32'))
 	{
 		// Feed a new string characters from the old string
 		var windowstext = "";
