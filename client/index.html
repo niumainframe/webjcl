@@ -7,6 +7,7 @@
 <link rel="stylesheet" type="text/css" href="css/ace.css">
 <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
 <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.10.1.custom.css">
+<script data-main="js/main-requirejs" src="js/require.js"></script>
 </head>
 <body>
 	<div id="header">
@@ -66,7 +67,28 @@
 		</div>
 		<div id="contentSpace">
 			<div id="leftWindow" class="window ui-layout-west">
-				<div class="panel"></div>
+				<div class="panel">
+				
+					<div class="panelBox codeBox" id="code">
+						<div class="header">
+							<h1>Code Processors</h1>
+						</div>
+						<div class="body">
+							<div class="content">
+								
+							<div class="codeProcessorGroup" id="preprocessors">
+								
+							</div>
+							
+							<div class="codeProcessorGroup" id="postprocessors">
+							
+							</div>
+	
+							</div>
+						</div>
+					</div>
+				
+				</div>
 			</div>
 			<div id="centerWindow" class="window ui-layout-center">
 				<div class="panel" id="codePanel">
@@ -116,7 +138,14 @@
 	<script src="js/jquery-ui-1.10.1.custom.js"></script>
 	<script src="js/jquery.layout.min.js"></script>
 	<script src="js/jquery.mousewheel.min.js"></script>
+	
 	<script src="js/JCLProcessor.js"></script>
+	<!-- 
+	<script src="js/Utilities.js"></script>
+	<script src="js/AceProcessingChain.js"></script> 
+	<script src="js/BaseJobPreprocessors.js"></script>
+	<script src="devel/hook_system/js/main.js"></script>
+	-->
 	<script src="js/main.js"></script>
 	<script src="js/textobject.js"></script>
 </body>

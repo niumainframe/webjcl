@@ -1,0 +1,48 @@
+/* This is a template file which ideally loads all the AMD modules in 
+ * postprocessors and preprocessors as (post|pre)processors for job submission
+ * 
+ * It can be built by running the node.js script: `build.load.js`
+ */
+
+define(%module_requirement_array%, function(%func_params%) 
+{ 
+	
+	// A list of parameter names available to this module.
+	var param_list = %param_list%;
+	
+	// Generate a map that associates a parameter name to this 
+	// function's parameters.
+	var param_map = {};
+	for (i in param_list)
+	{
+		var param_name = param_list[i];
+		
+		param_map[param_name] = arguments[i];
+		
+	}
+	
+	// Lists of (pre|post)processor functions
+	var preprocessors = %preprocessors%;
+	var postprocessors = %postprocessors%;
+	
+	// Obtain the WebJCL namespace.
+	window.WebJCL = window.WebJCL || {};
+	
+	WebJCL.PreprocessingChain = new AceProcessingChain();
+	WebJCL.PostprocessingChain = new AceProcessingChain();
+	
+	for (var i in preprocessors)
+	{
+		var processorName = preprocessors[i];
+		
+		WebJCL.PreprocessingChain.chain.push(param_map[processorName]);
+	}
+	
+	for (var i in postprocessors)
+	{
+		var processorName = postprocessors[i];
+		
+		WebJCL.PostprocessingChain.chain.push(param_map[processorName]);
+	}
+	
+});

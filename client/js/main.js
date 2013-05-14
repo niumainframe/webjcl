@@ -208,7 +208,11 @@ var submitJob = function(){
 	
 	$('#run-button').attr('disabled', 'disabled').find('i').removeClass('icon-play').addClass('icon-spinner').addClass('icon-spin');
 	
-	
+
+	// Invoke the JobPreprocessors
+	WebJCL.JobPreprocessors.invoke(textObject.editor);
+
+
 	jclProcessor.sendJob(text,
 		// Success callback
 		function(id, output, meta) {
