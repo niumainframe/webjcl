@@ -19,7 +19,7 @@ node_modules:
 ${rjs}: node_modules
 
 # Optimized JavaScript file.
-client/js/main-built.js: ${rjs}
+client/js/main-built.js: ${rjs} client/js/JobProcessing/load.js
 	${rjs} -o client/js/build.js
 
 # JobProcessing client loader js file.
