@@ -10,8 +10,16 @@ function build_require_list(require_list, param_list, folder)
 	
 	for (f in processors)
 	{
+		
+		// Analyze the filename
+		var file = processors[f].split('.');
+		
+		// Skip if this isn't a js file.
+		if (file[file.length-1] != 'js')
+			continue;
+			
 		// Obtain the filename without extension.
-		var file = processors[f].split('.')[0];
+		file = file[0];
 		
 		param_list.push(file);
 		
