@@ -38,7 +38,206 @@
           <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
         </div>
 
-        <h3>Placeholder</h3>
+        <p><img src="http://niumainframe.github.io/webjcl/images/webjcl-screenshot.png" alt="WebJCL Screenshot"></p>
+
+<p>WebJCL is a web-based development environment for programming with IBM Mainframe. It allows students to code and execute IBM assembler completely through the web-browser.  This was developed during an independent study between students at Northern Illinois University.  The server-side source code is currently written in node.js.</p>
+
+<p>Features</p>
+
+<ul>
+<li>
+<p>HTML5 interface.</p>
+
+<ul>
+<li>Ace code editor</li>
+<li>Multiple tabs</li>
+<li>Resizable input/output panes.</li>
+</ul>
+</li>
+<li>
+<p>RESTful job submission interface.</p>
+
+<ul>
+<li>Submit jobs to the real mainframe via HTTP protocol.</li>
+<li>Support for other job processing modules.</li>
+</ul>
+</li>
+</ul><h2>Prerequisites</h2>
+
+<p>Required environments and their minimum tested versions: </p>
+
+<p>Server:</p>
+
+<ul>
+<li>
+<a href="http://nodejs.org/">Node.js</a> v0.8.19</li>
+<li>
+<a href="http://www.mongodb.org/">mongoDB</a> v2.2.3</li>
+<li>Python 2.6</li>
+</ul><p>Client:</p>
+
+<ul>
+<li>A modern web browser
+
+<ul>
+<li>Chromium 23</li>
+<li>Firefox 18</li>
+</ul>
+</li>
+</ul><h2>Install</h2>
+
+<p>Note: the up-to-date installation instructions will probably in in the <a href="https://github.com/niumainframe/webjcl/blob/master/README.md">README.md</a> file in the source code.</p>
+
+<p>To obtain the source code, either download the archive file of your choice from this GitHub repository or run the following command in the directory you wish to install WebJCL.</p>
+
+<pre><code>git clone https://github.com/niumainframe/webjcl.git
+</code></pre>
+
+<p>After obtaining the source code, you must obtain the Node.js library requirements.</p>
+
+<pre><code>cd webjcl
+npm install
+</code></pre>
+
+<h3>Configuration</h3>
+
+<p>There is some mandatory configuration before WebJCL can execute.</p>
+
+<ul>
+<li>
+<p>config.js</p>
+
+<ul>
+<li>Listening port (default 8000)</li>
+<li>Whether to enforce SSL (default: true)</li>
+<li>mongoDB credentials.</li>
+</ul>
+</li>
+<li>
+<p>srcprocs/JESProc/config.js</p>
+
+<ul>
+<li>The hostname of the mainframe WebJCL connects to.</li>
+</ul>
+</li>
+</ul><h3>Invoking</h3>
+
+<p>Given that MongoDB is running, one can invoke WebJCL while in the source code directory:</p>
+
+<pre><code>node main.js
+</code></pre>
+
+<p>However in public-facing instances, it is highly recommended to use a persistence script which automatically restarts the application if it crashes.  The node.js application '<a href="https://npmjs.org/package/forever">forever</a>' is recommended for this purpose.</p>
+
+<h2>Background</h2>
+
+<p>NIU CS teaches the concepts of assembly language through the <a href="https://en.wikipedia.org/wiki/IBM_Basic_assembly_language">IBM Basic Assembly Language</a> and <a href="https://en.wikipedia.org/wiki/ASSIST_(computing">ASSIST</a>). While this is effective in exposing students how to program software at a low level; it is problematic because the development environment is limited compared to today's standards.</p>
+
+<h3>3270 Terminal</h3>
+
+<p>Prior to WebJCL, students typically obtained a 3270 terminal emulator to connect to a shared IBM Mainframe.  From this terminal students coded and executed assignment programs.</p>
+
+<p><img src="http://niumainframe.github.io/webjcl/images/3270-terminal.png" alt="Picture of a 3270 terminal"></p>
+
+<p>Programming in a 3270 terminal has the following problems:</p>
+
+<ul>
+<li>The terminal has fixed rows/columns and the smallest scrolling unit is typically one page. This causes long assignments and algorithms to span many terminal pages.</li>
+<li>Non-intuitive keyboard commands for editing, especially for undergraduate students unfamiliar with vi/emacs-like editors.</li>
+<li>Execution and retrieval of output text requires navigating through several menus from the editor.</li>
+</ul><h3>Other development options</h3>
+
+<ul>
+<li>
+<p>Using <a href="http://www.ibm.com/developerworks/systems/library/es-batch-zos.html">FTP-based</a> solutions</p>
+
+<ul>
+<li>mar_ftp.exe <a href="http://www.cs.niu.edu/compresource/marist_readme.txt">readme</a>
+</li>
+<li><a href="https://github.com/scvnc/JESftp">JESftp.py</a></li>
+<li><a href="https://github.com/john-charles/MVSTool">MVS-Tool</a></li>
+<li><a href="http://search.cpan.org/%7Emikeo/MVS-JESFTP-1.1/JESFTP.pm">MVS::JESFTP</a></li>
+</ul>
+</li>
+<li>
+<p>Using Simulators/Emulators</p>
+
+<ul>
+<li><a href="http://code.google.com/p/mainframe-env-simulator/">mainframe-env-simulator</a></li>
+<li><a href="http://z390.org/">z390</a></li>
+<li><a href="http://www.hercules-390.eu/">Hercules</a></li>
+</ul>
+</li>
+</ul><h2>Future Development Possibilities</h2>
+
+<p>Currently, this system uses a <a href="https://github.com/scvnc/JESftp">Python script</a> to interface with the actual mainframe to send, submit, retrieve, and clear the submission.  It would be nice to design and write a pure node.js module that utilizes the entire Mainframe/FTP interface.</p>
+
+<p>Adding additional job processing modules such as one that submits the job to a mainframe simulator or emulator instead of a real mainframe.  This could be extended further to other language/machine environments.</p>
+
+<p>Converting the database features to work with MySQL instead of mongoDB.</p>
+
+<p>File management features.</p>
+
+<p>Real-time collaboration/execution on code via something like the <a href="http://sharejs.org/">share.js</a> library.</p>
+
+<p>IBM assembler specific indentation and highlighting features for the editor.</p>
+
+<h2>Q&amp;A</h2>
+
+<p>Where to I go to use this?</p>
+
+<blockquote>
+<p>WebJCL does not have a permanent host. It runs great on the free EC2 node from Amazon, if you'd like to set one up.  Efforts will be made to have a host available each semester for student use.</p>
+</blockquote>
+
+<p>Do I need to set up my mainframe account with a 3270 terminal?</p>
+
+<blockquote>
+<p>For students taking CSCI 360: as far as we are concerned you could never touch a 3270 terminal, use WebJCL, and successfully complete the class.  It is still suggested to complete the lab tutorial on configuring your account on the mainframe.  The same should go for CSCI 640 as well.</p>
+</blockquote>
+
+<p>Is my source code saved anywhere?</p>
+
+<blockquote>
+<p>Yes.  When you submit code, both the code and the resulting output are saved in a database.  <em>Your code/output is only accessible with your login credentials.</em></p>
+</blockquote>
+
+<p>Does it work for students in CSCI 465 (or other mainframe courses)?</p>
+
+<blockquote>
+<p>Since this simply submits a JCL file to be processed, probably yes. However, since there are instances where you must reference files on the remote mainframe: you may have to manually FTP some of your files.  Let us know your experiences.</p>
+</blockquote>
+
+<p>Does this really work?</p>
+
+<blockquote>
+<p>Yes.  WebJCL was exposed to students taking CSCI 360 during Spring 2013.  Between 16 active users, 6000 jobs were submitted via WebJCL and all assignments can be successfully completed.</p>
+</blockquote>
+
+<p>How secure is this?</p>
+
+<ul>
+<li>WebJCL can run as an underprivileged user.</li>
+<li>WebJCL works with existing web-servers by configuring a <a href="https://httpd.apache.org/docs/2.2/mod/mod_proxy.html">reverse proxy</a>.</li>
+<li>WebJCL can enforce SSL connections for secure transmission of mainframe credentials.
+
+<ul>
+<li>However, the FTP interface to the mainframe probably has it's credentials sent in cleartext.</li>
+</ul>
+</li>
+<li>WebJCL practices password hashing.</li>
+<li>Temporary folders are created with permissions of 700.</li>
+</ul><p>Can I add a feature to WebJCL?</p>
+
+<blockquote>
+<p>Contact us (see support section) and make a request on the GitHub issue tracker.  We want to assist other students to continue this project. Most likely you could even get independent study credit at NIU. Fork away!</p>
+</blockquote>
+
+<h2>Support</h2>
+
+<p>For support and collaboration inquiries, please contact Vincent: vinciple [at] gmail [dot] com.</p>
+
+<p>Please utilize the issue tracker on GitHub for bugs, feature requests, and other applicable articles.</p>
       </section>
 
     </div>
