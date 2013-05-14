@@ -210,7 +210,7 @@ var submitJob = function(){
 	
 
 	// Invoke the JobPreprocessors
-	WebJCL.JobPreprocessors.invoke(textObject.editor);
+	WebJCL.PreprocessingChain.invoke(textObject.editor);
 
 
 	jclProcessor.sendJob(text,
@@ -272,6 +272,9 @@ var makeNewOutputTO = function(content, name) {
 	var index = outputPTO.createTextObject(name);
 	var o = outputPTO.getByIndex(index);
 	o.editor.setValue(content);
+	
+	// Invoke the JobPostprocessors chain
+	WebJCL.PostprocessingChain.invoke(o.editor);
 	
 	// make it read only
 	o.editor.setReadOnly(true);
