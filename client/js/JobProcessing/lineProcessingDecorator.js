@@ -27,6 +27,9 @@ define(function()
 			var document = session.getDocument();
 			var rows = document.getLength();
 			
+			// Obtain the position of the cursor before processing lines.
+			var startingCursorPos = aceEditor.getCursorPosition();
+			
 			for (var l = 0; l < rows; l++)
 			{
 				
@@ -46,6 +49,11 @@ define(function()
 				document.insertLines(l, modifiedLine);
 				
 			}
+			
+			// Restore position of the cursor.
+			aceEditor.gotoLine(startingCursorPos.row+1, startingCursorPos.column,
+			    false);
+			    
 		}
 		
 		
