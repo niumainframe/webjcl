@@ -42,9 +42,22 @@ define(['JobProcessing/lineProcessingDecorator'], function(lineProcessingDecorat
 	var commentBlankLines = lineProcessingDecorator(function(line)
 	{
 		
+		// Determine if this line containes the MACRO or MEND token and
+		// change the comment character accordingly.
+		
+		if(/^ *MACRO *$/.test(line))
+		{
+			commentBlankLines._char = '.*';
+		} 
+		else if (/^ *MEND *$/.test(line))
+		{
+			commentBlankLines._char = '*';
+		}
+		
+		// Test to see if the line is blank.
 		if(/^ *$/.test(line))
 		{
-			return '*';
+			return commentBlankLines._char;
 		}
 		
 		else
@@ -56,7 +69,13 @@ define(['JobProcessing/lineProcessingDecorator'], function(lineProcessingDecorat
 	});
 
 	commentBlankLines.label = "Comment blank lines";
-	commentBlankLines.description = "TESTING, TESTING";
+	commentBlankLines.description = "If a blank line is found, this will " +
+	                                "replace the line with the comment symbol." +
+	                                " If the MACRO token is found, it will begin" +
+	                                " using the macro comment symbol until MEND" +
+	                                " is found.";
+	                                
+	commentBlankLines._char = '*';
 
 
 	return commentBlankLines;
