@@ -10,8 +10,8 @@
 		"async":"0.2.x",
 		"express":"3.1.x",
 		"node-uuid":"1.4.x",
-		"mongodb":">=1.2.13",
-		"ftp":">=0.3.1"
+		"mongodb":"1.2.13",
+		"ftp":"0.3.1"
 	}
 
 }
