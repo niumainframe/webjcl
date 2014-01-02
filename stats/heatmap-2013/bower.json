@@ -1,0 +1,22 @@
+{
+  "name": "heatmap-2013",
+  "version": "0.0.1",
+  "homepage": "https://github.com/niumainframe/webjcl",
+  "authors": [
+    "Vincent Schramer <vinciple@gmail.com>"
+  ],
+  "description": "WebJCL usage heatmap for 2013",
+  "main": "index.html",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "cal-heatmap": "~3.3.9",
+    "jquery": "~2.0.3"
+  }
+}
