@@ -1,17 +1,20 @@
 {
-	"name": "WebJCL",
-	"version": "0.1.0",
-	"scripts": 
-	{
-		"start":"node main.js"
-	},
-	"dependencies":
-	{
-		"async":"0.2.x",
-		"express":"3.1.x",
-		"node-uuid":"1.4.x",
-		"mongodb":"1.2.13",
-		"ftp":"0.3.1"
-	}
-
+  "name": "WebJCL",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "async": "0.2.x",
+    "express": "3.1.x",
+    "node-uuid": "1.4.x",
+    "mongodb": "1.2.13",
+    "ftp": "0.3.1"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-jasmine-node": "git+https://github.com/scvnc/grunt-jasmine-node.git",
+    "frisby": "~0.7.8",
+    "request": "~2.33.0"
+  }
 }
