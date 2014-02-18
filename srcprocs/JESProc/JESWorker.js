@@ -190,7 +190,7 @@ JESWorker.prototype._writeJobFiles = function(callback)
 			// Write the credentials config to the workspace.
 			fs.writeFile(self._configFile, 
 			"[JESftp]\n" +
-			"server = " + config.host + "\n" +
+			"server = " + config.host + ":" + config.port + "\n" +
 			"username = " + self.username+ "\n" +
 			"password = " + self._password, next);
 			

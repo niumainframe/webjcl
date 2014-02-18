@@ -65,7 +65,7 @@ var Authenticator =
 				// be rethunk.
 				ftpClient = new ftp();
 				jesConf = require('./srcprocs/JESProc/config.js');
-				ftpClient.connect({"host": jesConf.host, "user": username, "password": password});
+				ftpClient.connect({"host": jesConf.host, "port": jesConf.port, "user": username, "password": password});
 				
 				// CASE: successful login
 				ftpClient.on('ready', function()
