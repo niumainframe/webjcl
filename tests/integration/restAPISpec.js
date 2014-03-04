@@ -3,9 +3,12 @@ var request = require('request');
 var child_process = require('child_process');
 var grunt = require('grunt');
 
-var host = grunt.config.get('jasmine_node.integration.apiEndpoint');
-var creds = grunt.config.get('jasmine_node.integration.auth');
-
+var host = grunt.config.get('jasmine_node.integration.apiEndpoint') 
+        || 'http://localhost:8000';
+        
+var creds = grunt.config.get('jasmine_node.integration.auth')
+        || {user: 'goodUser', pass: 'goodPass'};
+        
 var testJob = "//" + creds.user + "A JOB ,'CSCI360',MSGCLASS=H";
 
 frisby.globalSetup({ timeout: 10000 });
@@ -17,8 +20,8 @@ describe('WebJCL REST API', function () {
         
         frisby.create('GET / should return HTML')
             .get(host + '/')
-            .expectHeaderContains('Content-Type', 'text/html')
             .expectStatus(200)
+            .expectHeaderContains('Content-Type', 'text/html')
             .toss();
     });
     
@@ -38,10 +41,9 @@ describe('WebJCL REST API', function () {
             .expectHeaderContains('Content-Type', 'application/json')
             .toss();
 
-        jobListingFrisby('with invalid credentials', creds.user, 
+        jobListingFrisby('with invalid credentials', 'badUser', 
             'badPassword')
             .expectStatus(401)
-            .expectHeaderContains('Content-Type', 'text/plain')
             .expectBodyContains("Unauthorized")
             .toss();
     });
@@ -77,6 +79,15 @@ describe('WebJCL REST API', function () {
                 completion: 5,
                 username: creds.user
             })
+            .toss();
+            
+        frisby.create('with bad credentials')
+            .post(host + '/srcprocs/JESProc/jobs', payload, {
+                json: true,
+                auth: { user: 'tope', pass: 'drope' }
+            })
+            .expectStatus(403) // should be 401 really
+            .inspectBody()
             .toss();
         
     });

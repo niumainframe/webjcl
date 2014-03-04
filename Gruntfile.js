@@ -12,9 +12,33 @@ module.exports = function(grunt) {
                 
                 apiEndpoint: "http://localhost:8000",
                 auth: { user: "goodUser", pass: "goodPass" },
+                ftpHost: 'localhost',
+                ftpPort: '2121',
                 
                 specNameMatcher: "spec", // load only specs containing specNameMatcher
-                specFolders: ['./tests/integration'],
+                specFolders: [
+                    './tests/integration',
+                    './tests/v2/integration'
+                ],
+                requirejs: false,
+                forceExit: false
+            },
+            
+            unit: {
+                specNameMatcher: "Spec",
+                specFolders: [
+                    './tests/v2/unit'
+                    ],
+                requirejs: false,
+                forceExit: false
+            },
+            
+            refactor_tests: {
+                
+                specNameMatcher: "Spec",
+                specFolders: [
+                    './tests/v2/unit'
+                ],
                 requirejs: false,
                 forceExit: false
             }
