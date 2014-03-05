@@ -21,7 +21,11 @@ describe('WebJCL Jobs API', function () {
     var expressPort = 30023;
     var host = 'http://localhost:' + expressPort;
     var creds = { user: 'goodUser', pass: 'goodPass' };
-    var resultingJob = new Job({
+    
+    /* * * * * * * *
+     * TEST DATA
+     */
+    var testJob = new Job({
             id: 'ABC-123',
             user: creds.user,
             body: "//" + creds.user + "A JOB ,'CSCI360',MSGCLASS=H",
@@ -29,15 +33,51 @@ describe('WebJCL Jobs API', function () {
             date: new Date(2042, 10, 1, 9, 29, 0)
     });
     
-    beforeEach(function (done) {
+    var testJobList = [testJob];
+    
+    var jobJsonVerifier = {
+        id: testJob.id,
+        body: testJob.body,
+        output: testJob.output,
+        user: testJob.user,
+        date: function(v) {
+            expect(new Date(v).getTime())
+                .toEqual(testJob.date.getTime());
+        }
+    };
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    
+    beforeEach(function () {
+        
+        jobController = Object.create(JobController.prototype);
         
         // Have jobController.submitJob resolve a mocked job
         var deferred = Q.defer();
-        deferred.resolve(resultingJob);
-        
-        jobController = Object.create(JobController.prototype);
+        deferred.resolve(testJob);
         spyOn(jobController, 'submitJob')
             .andReturn(deferred.promise);
+        
+        // Have jobController.listJobs resolve a mocked job list
+        deferred = Q.defer();
+        deferred.resolve(testJobList);
+        spyOn(jobController, 'listJobs')
+            .andReturn(deferred.promise);
+            
+        // Have jobController.getJobById resolve a mocked job
+        deferred = Q.defer();
+        deferred.resolve(testJob);
+        spyOn(jobController, 'getJobById')
+            .andReturn(deferred.promise);
+        
+    });
+    
+    afterEach(function (done) {
+        server.close(function () {
+            done();
+        });
+    });
+    
+    var act = function (done) {
         
         // Assemble the WebJCL Api
         webJclApi = WebJclApi({
@@ -50,72 +90,100 @@ describe('WebJCL Jobs API', function () {
         server = http.createServer(app).listen(expressPort, function () {
             done();
         });
+    }
+    
+    describe('Retrieving a saved job', function () {
+        
+        var testId = 'abcd-12345';
+        
+        beforeEach(function (done) {
+            act(done);
+        });
+        
+        var retrFrisby = frisby.create('with good credentials') 
+            .get(host + '/jobs/' + testId, {
+                auth: { user: creds.user, pass: creds.pass }
+            })
+            .expectStatus(200)
+            .expectJSON(jobJsonVerifier);
+            
+        retrFrisby.current.expects.push(function () {
+            expect(jobController.getJobById)
+                .toHaveBeenCalledWith(testId);
+        });
+        
+        retrFrisby.toss();
+        
+        //------
+        frisby.create('with bad credentials')
+            .get(host + '/jobs', {
+                auth: { user: creds.user+'bad', pass: creds.pass }
+            })
+            .expectStatus(401)
+            .toss();
     });
+
     
-    afterEach(function (done) {
-        server.close(function () {
-            done();
+    describe('Job listing', function () {
+        
+        beforeEach(function (done) {
+            act(done);
         });
+        
+        var listFrisby = frisby.create('with good credentials')
+            .get(host + '/jobs', {
+                auth: { user: creds.user, pass: creds.pass }
+            })
+            .expectStatus(200)
+            .expectJSON('*', jobJsonVerifier)
+            listFrisby.current.expects.push(function () {
+                expect(jobController.listJobs)
+                    .toHaveBeenCalledWith(creds.user);
+            });
+            
+            listFrisby.toss();
+        
+        frisby.create('with bad credentials')
+            .get(host + '/jobs', {
+                auth: { user: creds.user+'bad', pass: creds.pass }
+            })
+            .expectStatus(401)
+            .toss();
     });
-    
-    frisby.create('Retrieving a saved job') 
-        .get(host + '/jobs/fakeid', {
-            auth: { user: creds.user, pass: creds.pass }
-        })
-        .expectStatus(200)
-        .toss();
-    
-    frisby.create('Job listing')
-        .get(host + '/jobs', {
-            auth: { user: creds.user, pass: creds.pass }
-        })
-        .expectStatus(200)
-        .toss();
+
         
-    describe('Posting a job', function () {
+    describe('Posting a job', function (done) {
         
-        var payload = resultingJob.body;
+        var payload = testJob.body;
         
-        describe('with good credentials', function () {
-            
-            var postFrisby = frisby.create('should succeed')
-                .post(host + '/jobs', null, {
-                    headers: {
-                        'content-type': 'text/plain'
-                    },
-                    body: payload,
-                    auth: { user: creds.user, pass: creds.pass }
-                })
-                .expectStatus(200)
-                .expectJSON({
-                    id: resultingJob.id,
-                    body: resultingJob.body,
-                    output: resultingJob.output,
-                    user: resultingJob.user,
-                    date: function(v) {
-                        expect(new Date(v).getTime())
-                            .toEqual(resultingJob.date.getTime());
-                    }
-                })
-                .expectHeaderContains('Last-Modified', 'Sat, 01 Nov 2042 14:29:00 GMT');
-                
-                postFrisby.current.expects.push(function(){
-                    expect(jobController.submitJob)
-                        .toHaveBeenCalledWith(payload, creds.user, creds.pass);
-                });
-                
-                postFrisby.toss();
+        beforeEach(function (done) {
+            act(done);
         });
+        
+        var postFrisby = frisby.create('with good credentials')
+            .post(host + '/jobs', null, {
+                headers: {
+                    'content-type': 'text/plain'
+                },
+                body: testJob.body,
+                auth: { user: creds.user, pass: creds.pass }
+            })
+            .expectStatus(200)
+            .expectJSON(jobJsonVerifier)
+            .expectHeaderContains('Last-Modified', 'Sat, 01 Nov 2042 14:29:00 GMT');
             
-        describe('with bad credentials', function () {
+            postFrisby.current.expects.push(function(){
+                expect(jobController.submitJob)
+                    .toHaveBeenCalledWith(payload, creds.user, creds.pass);
+            });
             
-            frisby.create('should return unauthorized')
-                .post(host + '/jobs', null, {
-                    auth: { user: creds.user+'bad', pass: creds.pass }
-                })
-                .expectStatus(401)
-                .inspectBody()
-                .toss();
-        });
+            postFrisby.toss();
+            
+        frisby.create('with bad credentials')
+            .post(host + '/jobs', null, {
+                auth: { user: creds.user+'bad', pass: creds.pass }
+            })
+            .expectStatus(401)
+            .toss();
     });
 });

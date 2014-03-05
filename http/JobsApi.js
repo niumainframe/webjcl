@@ -25,11 +25,15 @@ function WebJclApiFactory(config) {
     WebJclApi.use(middleware.textBodyParser);
     
     WebJclApi.get('/jobs', function (req, res) {
-        res.send(200);
+        
+        jobController
+            .listJobs(req.user)
+            .then(function (jobs) {
+                res.send(jobs);
+            });;
     });
 
-    WebJclApi.post('/jobs',
-        function (req, res) {
+    WebJclApi.post('/jobs', function (req, res) {
             
             jobController
                 .submitJob(req.body, req.user, req.auth.password)
@@ -40,7 +44,12 @@ function WebJclApiFactory(config) {
     });
 
     WebJclApi.get('/jobs/:id', function (req, res) {
-        res.send(200);
+        
+        jobController
+            .getJobById(req.params['id'])
+            .then(function(job) {
+                res.send(job);
+            });
     });
     
     return WebJclApi;

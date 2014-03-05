@@ -26,11 +26,6 @@ describe('JobController Module', function () {
         spyOn(jobRepository, 'saveJob')
             .andCallThrough();
         
-        // Inject mocked deferred object
-        deferred = Q.defer();
-        spyOn(Q, 'defer')
-            .andReturn(deferred);
-        
         jobController = new JobController();
         jobController.jclProcessor = jclProcessor;
         jobController.jobRepository = jobRepository;
@@ -62,7 +57,7 @@ describe('JobController Module', function () {
         });
         
         it('should return a promise', function () {
-            expect(jobCtrlTask).toBe(deferred.promise);
+            expect(jobCtrlTask.then).toBeDefined();
         });
         
         it('should submit the job to the JclProcessor', function () {
@@ -90,6 +85,77 @@ describe('JobController Module', function () {
         
             it('should resolve the completed job', function () {
                 expect(jobCtrlTaskResolvedVal).toBe(processedJob)
+            });
+        });
+    });
+
+    describe('when asked to list jobs', function () {
+        
+        var listJobsTask, getJobsByUserDefer, returnedJobs;
+        
+        var testUser = 'TESTUSER';
+        var returnedJobs = [{}, {}];
+        
+        beforeEach(function () {
+            
+            // Stub on repo's getJobsByUser
+            getJobsByUserDefer = Q.defer();
+            spyOn(jobRepository, 'getJobsByUser')
+                .andReturn(getJobsByUserDefer.promise);
+            getJobsByUserDefer.resolve(returnedJobs);
+            
+            // Act
+            listJobsTask = jobController.listJobs(testUser);
+        });
+        
+        it('should return a promise', function () {
+            expect(listJobsTask.then).toBeDefined();
+        });
+        
+        it('should obtain the jobs from the repository', function () {
+            expect(jobRepository.getJobsByUser)
+                .toHaveBeenCalledWith(testUser);
+        });
+
+        it('should resolve the list of the users jobs', function (done) {
+            listJobsTask.then(function(jobs) {
+               expect(jobs).toBe(returnedJobs); 
+               done();
+            });
+        });
+        
+    });
+
+    describe('when asked for a job by id', function () {
+        var getJobTask, getJobByIdRepoTask;
+        var testId = 102;
+        var testJob = { 'jov': 'jov'};
+        
+        
+        beforeEach(function () {
+        
+            // Stub on repo's getJobById
+            getJobByIdRepoTask = Q.defer();
+            spyOn(jobRepository, 'getJobById')
+                .andReturn(getJobByIdRepoTask.promise);
+            getJobByIdRepoTask.resolve(testJob);
+            
+            
+            getJobTask = jobController.getJobById(testId);
+        });
+        
+        it('should return a promise', function () {
+            expect(getJobTask.then).toBeDefined();
+        });
+        
+        it('should obtain the job from the repository', function () {
+            expect(jobRepository.getJobById).toHaveBeenCalled();
+        });
+        
+        it('should resolve the returned job', function (done) {
+            getJobTask.then(function(job) {
+               expect(job).toBe(testJob); 
+               done();
             });
         });
     });

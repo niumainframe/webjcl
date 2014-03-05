@@ -17,7 +17,6 @@ JobController.prototype.submitJob = function (body, un, pw) {
         .then(function (completedJob) {
 
             self.jobRepository.saveJob(completedJob);
-
             
             ourDefer.resolve(completedJob);
         });
@@ -25,5 +24,29 @@ JobController.prototype.submitJob = function (body, un, pw) {
     return ourDefer.promise;
 }
 
+JobController.prototype.listJobs = function(user) {
+    
+    var ourDefer =  Q.defer();
+    
+    this.jobRepository.getJobsByUser(user)
+        .then(function(jobs) {
+            ourDefer.resolve(jobs);
+        });
+    
+    return ourDefer.promise;
+}
 
+
+JobController.prototype.getJobById = function(id) {
+    
+    var ourDefer =  Q.defer();
+    
+    this.jobRepository.getJobById(id)
+        .then(function (job) {
+            ourDefer.resolve(job);
+        });
+    
+    return ourDefer.promise;
+    
+}
 module.exports = JobController;
