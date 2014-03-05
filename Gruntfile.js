@@ -33,6 +33,16 @@ module.exports = function(grunt) {
                 forceExit: false
             },
             
+            E2E: {
+                specNameMatcher: "Spec",
+                specFolders: [
+                    './tests/v2/E2E'
+                    ],
+                requirejs: false,
+                forceExit: false
+                
+            },
+            
             refactor_tests: {
                 
                 specNameMatcher: "Spec",
