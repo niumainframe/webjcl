@@ -1,10 +1,5 @@
 var http  = require('http');
-var https = require('https');
 var express = require('express');
-var fs = require('fs');
-//var mongo = require('./mongo.js');
-//var Authenticator = require('./Authenticator');
-var package = require('./package.json');
 var config = require('./config.js');
 
 //-- WebJCL Jobs API ---------------------------------------------------------
@@ -12,7 +7,6 @@ var JobController = require('./framework/JobController');
 var JobRepository = require('./framework/JobRepository');
 var JclProcessor = require('./framework/JclProcessor');
 var FtpBasicAuth = require('./middleware.js').FtpBasicAuth('localhost', '2121');
-
 
 var jobRepository = new JobRepository();
 var jclProcessor = new JclProcessor();
