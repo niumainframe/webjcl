@@ -2,7 +2,7 @@ var Q = require('q');
 
 var JobController = function (config) {
     
-    
+    config = config || {};
     
     this.jclProcessor = config.jclProcessor || 
         console.warn('JobController requires jclProcessor');

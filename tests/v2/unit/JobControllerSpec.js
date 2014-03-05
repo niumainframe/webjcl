@@ -26,9 +26,10 @@ describe('JobController Module', function () {
         spyOn(jobRepository, 'saveJob')
             .andCallThrough();
         
-        jobController = new JobController();
-        jobController.jclProcessor = jclProcessor;
-        jobController.jobRepository = jobRepository;
+        jobController = new JobController({
+            jclProcessor: jclProcessor,
+            jobRepository: jobRepository
+        });
     });
     
     it('should instantiate', function () {
