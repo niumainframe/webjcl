@@ -7,10 +7,24 @@ var fs = require('fs');
 var package = require('./package.json');
 var config = require('./config.js');
 
-//-- WebJCL API ---------------------------------------------------------
-var JobController = require('./framework/JobController.js');
-var JobsApi = require('./http/JobsApi.js')({
-    jobController: new JobController()
+//-- WebJCL Jobs API ---------------------------------------------------------
+var JobController = require('./framework/JobController');
+var JobRepository = require('./framework/JobRepository');
+var JclProcessor = require('./framework/JclProcessor');
+var FtpBasicAuth = require('./middleware.js').FtpBasicAuth('localhost', '2121');
+
+
+var jobRepository = new JobRepository();
+var jclProcessor = new JclProcessor();
+
+var jobController = new JobController({
+    jobRepository: jobRepository,
+    jclProcessor: jclProcessor
+});
+
+var jobsApi = require('./http/JobsApi.js')({
+    jobController: jobController,
+    authenticator: FtpBasicAuth
 });
 //-----------------------------------------------------------------------
 
@@ -18,7 +32,7 @@ var JobsApi = require('./http/JobsApi.js')({
 //---- Site Mounts -------------------------------------------------------
 var site = express();
 
-site.use('/webjcl/v1', JobsApi);  
+site.use('/webjcl/v2', jobsApi); 
 
 // Default action
 site.use('/', function (req, res) {
