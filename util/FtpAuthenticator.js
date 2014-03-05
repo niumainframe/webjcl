@@ -42,7 +42,6 @@ function FtpAuthenticator (config) {
     }
     
     return function (user, pass, result) {
-        console.log('hi');
         cache.get(user, function (err, values) {
             
             if(!values.hasOwnProperty(user)) 
