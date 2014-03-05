@@ -17,7 +17,11 @@ var middleware = require(root + '/middleware.js');
  */
 function WebJclApiFactory(config) {
     
-    var jobController = config.jobController;
+    var jobController = config.jobController || 
+        console.warn('WebJclApiFactory needs jobController');
+    var authenticator = config.authenticator ||
+        console.warn('WebJclApiFactory needs authenticator');
+        
     var WebJclApi = express();
     
 
@@ -34,7 +38,6 @@ function WebJclApiFactory(config) {
     });
 
     WebJclApi.post('/jobs', function (req, res) {
-            
             jobController
                 .submitJob(req.body, req.user, req.auth.password)
                 .then(function (job) {

@@ -6,7 +6,7 @@ function Job (params) {
     this.user = params.user || null;
     this.body = params.body || null;
     this.output = params.output || null;
-    this.date = params.date || Date();
+    this.date = params.date || new Date();
     
     Object.seal(this)
 }

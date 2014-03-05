@@ -1,9 +1,14 @@
 var Q = require('q');
 
-var JobController = function () {
+var JobController = function (config) {
     
-    this.jclProcessor = null;
-    this.jobRepository = null;
+    
+    
+    this.jclProcessor = config.jclProcessor || 
+        console.warn('JobController requires jclProcessor');
+        
+    this.jobRepository = config.jobRepository ||
+        console.warn('JobController requires jobRepository');
     
     Object.seal(this);
 }
