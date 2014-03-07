@@ -29,10 +29,13 @@ JobController.prototype.submitJob = function (body, un, pw) {
                 user: un
             });
             
-            self.jobRepository.saveJob(job);
-            
-            ourDefer.resolve(job);
+            self.jobRepository.saveJob(job)
+                .then(function (savedJobID) {
+                    job.id = savedJobID;
+                    ourDefer.resolve(job);
+                });
         });
+        
     
     return ourDefer.promise;
 }

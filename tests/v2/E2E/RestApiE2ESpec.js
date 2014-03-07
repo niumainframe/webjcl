@@ -11,14 +11,15 @@ var creds = grunt.config
 
 var host = 'http://localhost:30203',
     mount = '/webjcl/v2',
-    testId = 2345,
     user = creds.user || 'goodUser',
-    pass = creds.pass || 'goodPass';;
-        
+    pass = creds.pass || 'goodPass';
+
+var testJob = 'asdf';
+    testJobId = 2345,
     
 describe('WebJCL REST API E2E Tests', function () {
     var server;
-    
+
     beforeEach(function (done) {
         server = http.createServer(webJCLExpressApp)
             .listen(30203, function() {
@@ -31,9 +32,36 @@ describe('WebJCL REST API E2E Tests', function () {
             done();
         });
     });
-        
+
+
+    frisby.create('Submit Job')
+        .post(host + mount + '/jobs', null, {
+                headers: {
+                    'content-type': 'text/plain'
+                },
+                body: testJob,
+                auth: { user: user, pass: pass }
+        })
+        .expectJSON({
+            user: user,
+            body: testJob,
+            output: function(val) {
+                expect(val).toContain(testJob);
+            },
+            id: function(val) {
+                expect(val.match(/^[0-9a-fA-F]+$/))
+                    .toBeTruthy();
+            },
+            date: function(val) {
+                var parseDate = new Date(val).toString();
+                expect(parseDate).not.toBe('Invalid Date');
+            }
+        })
+        .expectStatus(200)
+        .toss();
+
     frisby.create('Get job by id')
-        .get(host + mount + '/jobs/' + testId, {
+        .get(host + mount + '/jobs/' + testJobId, {
             auth: { user: user, pass: pass }
         })
         .expectStatus(200)
@@ -43,30 +71,25 @@ describe('WebJCL REST API E2E Tests', function () {
         .get(host + mount + '/jobs', {
             auth: { user: user, pass: pass }
         })
-        .expectStatus(200)
-        .toss();
-        
-    frisby.create('Submit Job')
-        .post(host + mount + '/jobs', null, {
-                headers: {
-                    'content-type': 'text/plain'
-                },
-                body: 'JOb',
-                auth: { user: user, pass: pass }
+        .expectJSONTypes('*', {
+            user: user,
+            body: String,
+            output: String,
+            id: function(val) {
+                expect(val.match(/^[0-9a-fA-F]+$/))
+                    .toBeTruthy();
+            },
+            date: function(val) {
+                var parseDate = new Date(val).toString();
+                expect(parseDate).not.toBe('Invalid Date');
+            }
         })
         .expectStatus(200)
         .toss();
         
+
+        
 });
-
-        
-        
-
-        
-
-
-
-
 
 
 function VerifyAuthorization(name, endpoint) {

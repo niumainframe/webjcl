@@ -5,9 +5,9 @@ var JobRepository = require(root + '/framework/JobRepository.js');
 var Job = require(root + '/models/Job');
 var mongo = require(root + '/mongo');
 
-describe('stuff', function () {
+describe('JobRepository (integrated with MongoDB)', function () {
 
-    var jobRepository, testJob;
+    var jobRepository, testJob, originalJobId = 'abcdef12345';
     var jobIds = [];
 
     beforeEach(function () {
@@ -25,27 +25,26 @@ describe('stuff', function () {
     
     describe('Saving a job', function () {
         
-        var jobResult;
+        var savedId;
         
         beforeEach(function (done) {
-        
+            savedId = null;
+            
             jobRepository.saveJob(testJob)
-                .then(function (job) {
-                    
-                    jobResult = job;
-                    jobIds.push(job._id);
+                .then(function (id) {
+                    savedId = id;
+                    jobIds.push(id);
                     done();
                 });
         });
         
-        it('should have applied an id', function () {
-            expect(jobResult.id).not.toBe(null);            
+        it('should resolve an id', function () {
+            expect(savedId.toString().match(/^[0-9a-fA-F]+$/))
+                .toBeTruthy();
         });
         
-        it('should return the saved job', function () {
-            expect(jobResult.user).toBe(testJob.user);
-            expect(jobResult.body).toBe(testJob.body);
-            expect(jobResult.output).toBe(testJob.output);
+        it('should not have added the _id property to the job', function () {
+            expect(testJob._id).not.toBeDefined();
         });
         
     });
@@ -80,7 +79,7 @@ describe('stuff', function () {
             });
             
             it('should have applied an id', function () {
-                expect(jobResult.id).not.toBe(null);            
+                expect(jobResult.id).toBeTruthy();            
             });
             
             it('should resolve the saved job', function () {
@@ -131,8 +130,15 @@ describe('stuff', function () {
         });
         
         it('should have jobs in it', function () {
-            expect(jobList.length > 0).toBe(true); 
+            var listLen = jobList.length;
+            expect(listLen > 0 && listLen <= 5).toBe(true); 
+        });
+        
+        it('each job should have an id', function () {
+            jobList.forEach(function (job) {
+                expect(job.id).toBeDefined();
+                expect(job._id).not.toBeDefined();
+            });
         });
     });
-
 });

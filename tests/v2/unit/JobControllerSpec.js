@@ -34,13 +34,9 @@ describe('JobController Module (unit)', function () {
             });
         spyOn(jobRepository, 'saveJob')
             .andCallFake(function (job) {
-                
                 var deferred = Q.defer();
-                
-                job.id = testDBId;
-                deferred.resolve(job);
-                
-                return deferred;
+                deferred.resolve(testDBId);
+                return deferred.promise;
             });
 
 
@@ -109,9 +105,12 @@ describe('JobController Module (unit)', function () {
                 .toEqual(testUser);
         });
         
-        it('should resolve the completed job', function () {
+        it('should apply the repository ID to the job', function () {
             expect(resolvedValue.id)
                 .toEqual(testDBId);
+        });
+        
+        it('should resolve the completed job', function () {
             
             expect(resolvedValue.output)
                 .toEqual(testJobOutput);

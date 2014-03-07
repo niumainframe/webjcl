@@ -18,8 +18,10 @@ JobRepository.prototype.saveJob = function (job) {
     
     this.db.collection('Jobs', {safe:true}, function (err, coll) {
         coll.insert(job, function (err, record) {
-            job.id = record[0]._id;
-            deferred.resolve(job);
+            var savedJob = record[0];
+            savedJob.id = savedJob._id;
+            delete savedJob._id;
+            deferred.resolve(savedJob.id);
         });
     });
     
@@ -37,6 +39,12 @@ JobRepository.prototype.getJobsByUser = function (user) {
         coll.find(selector, queryOpts, function(err, result) {
             
             result.toArray(function(err, array) {
+                
+                array.forEach(function (job) {
+                   job.id = job._id;
+                   delete job._id;
+                });
+                
                 deferred.resolve(array);
             });
         });
@@ -60,7 +68,7 @@ JobRepository.prototype.getJobById = function (id) {
             deferred.resolve(null);
             return deferred.promise;
         }
-
+        
         // Query mongo
         var selector = {_id: objectId };
         coll.findOne(selector, function(err, result) {
