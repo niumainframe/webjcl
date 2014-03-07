@@ -5,7 +5,7 @@ var textBody = require('body');
 var middleware = require(root + '/middleware.js');
 
 /**
- * WebJclApiFactory
+ * JobsApi
  * 
  * @returns express.js application
  * 
@@ -15,20 +15,20 @@ var middleware = require(root + '/middleware.js');
  *  authenticator
  *      Middleware which will parse HTTP basic auth.
  */
-function WebJclApiFactory(config) {
+function JobsApi(config) {
     
     var jobController = config.jobController || 
-        console.warn('WebJclApiFactory needs jobController');
+        console.warn('JobsApi needs jobController');
     var authenticator = config.authenticator ||
-        console.warn('WebJclApiFactory needs authenticator');
+        console.warn('JobsApi needs authenticator');
         
-    var WebJclApi = express();
+    var app = express();
     
 
-    WebJclApi.use(config.authenticator);
-    WebJclApi.use(middleware.textBodyParser);
+    app.use(config.authenticator);
+    app.use(middleware.textBodyParser);
     
-    WebJclApi.get('/jobs', function (req, res) {
+    app.get('/jobs', function (req, res) {
         
         jobController
             .listJobs(req.user)
@@ -37,7 +37,7 @@ function WebJclApiFactory(config) {
             });;
     });
 
-    WebJclApi.post('/jobs', function (req, res) {
+    app.post('/jobs', function (req, res) {
             jobController
                 .submitJob(req.body, req.user, req.auth.password)
                 .then(function (job) {
@@ -46,7 +46,7 @@ function WebJclApiFactory(config) {
                 });
     });
 
-    WebJclApi.get('/jobs/:id', function (req, res) {
+    app.get('/jobs/:id', function (req, res) {
         
         jobController
             .getJobById(req.params['id'])
@@ -55,10 +55,10 @@ function WebJclApiFactory(config) {
             });
     });
     
-    return WebJclApi;
+    return app;
 }
 
 
 
 
-module.exports = WebJclApiFactory
+module.exports = JobsApi
