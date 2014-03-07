@@ -16,7 +16,8 @@ var JobsApi = require(root + '/http/JobsApi');
 
 var jobRepository = new JobRepository();
 var jclProcessor = new JclProcessor();
-var ftpBasicAuth = FtpBasicAuth('localhost', '2121');
+var credentialsTTL = 30 * 60;
+var ftpBasicAuth = FtpBasicAuth('localhost', '2121', credentialsTTL);
 
 var jobController = new JobController({
         jclProcessor: jclProcessor,

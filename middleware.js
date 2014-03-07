@@ -9,14 +9,14 @@ var FtpAuthenticator = require('./util/FtpAuthenticator');
 var JSFtpFactory = require('./util/JSFtpFactory.js');
 var NodeCache = require('node-cache')
 
-middleware.FtpBasicAuth = function (host, port) {
+middleware.FtpBasicAuth = function (host, port, cacheTime) {
     
     var ftpAuthorizer = FtpAuthenticator({
         host: host,
         port: port,
         ftpFactory: JSFtpFactory,
         cache: new NodeCache({ 
-            stdTTL: 30*60 // 30 min
+            stdTTL: cacheTime || 30*60 // 30 min default
         })
     });
     return express.basicAuth(ftpAuthorizer);
