@@ -1,8 +1,23 @@
 {
   "name": "WebJCL",
-  "version": "0.1.0",
+  "description": "Web application interfacing with IBM mainframe.",
+  "repository": { 
+    "type": "git",
+    "url": "https://github.com/niumainframe/webjcl.git"
+  },
+  "homepage": "http://webjcl.com",
+  "bugs": "https://github.com/niumainframe/webjcl/issues",
+  "version": "0.2.1",
+  "people": [
+    "Vincent Schramer <vinciple@gmail.com>",
+    "Nick Ruhe <ruhe.nick@gmail.com>"
+  ],
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "test": "grunt test"
+  },
+  "engines" : {
+    "node" : ">=0.10.26"
   },
   "dependencies": {
     "async": "0.2.x",
@@ -12,7 +27,8 @@
     "ftp": "0.3.1",
     "q": "^1.0.0",
     "jsftp": "^1.2.1",
-    "node-cache": "^0.4.1"
+    "node-cache": "^0.4.1",
+    "body": "^4.4.2"
   },
   "devDependencies": {
     "grunt": "~0.4.2",
