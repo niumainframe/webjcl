@@ -8,24 +8,42 @@ var JclProcessor = require(root + '/framework/JclProcessor.js');
 var JobRepository = require(root + '/framework/JobRepository.js');
 var Job = require(root + '/models/Job.js');
 
-describe('JobController Module', function () {
-    var jobController, 
-    jclProcessor, jobRepository,
-    jclProcessorTask;
+describe('JobController Module (unit)', function () {
+    var jobController, jclProcessor, jobRepository,
+        testDBId, testJobOutput;
     
     beforeEach(function () {
         
         // Configure mock JclProcessor
+        testJobOutput = 'Some random Job Text';
+        
         jclProcessor = new JclProcessor();
-        jclProcessorTask = Q.defer();
+        
         spyOn(jclProcessor, 'submitJob')
-            .andReturn(jclProcessorTask.promise);
+            .andCallFake(function (job) {
+                var deferred = Q.defer();
+                deferred.resolve(testJobOutput);
+                return deferred.promise
+            });
         
-        // Configure mock jobRepository
-        jobRepository = new JobRepository();
+        // Configure mock JobRepository
+        testDBId = '123123123';
+        
+        jobRepository = new JobRepository({
+                mongoDb: {}
+            });
         spyOn(jobRepository, 'saveJob')
-            .andCallThrough();
-        
+            .andCallFake(function (job) {
+                
+                var deferred = Q.defer();
+                
+                job.id = testDBId;
+                deferred.resolve(job);
+                
+                return deferred;
+            });
+
+
         jobController = new JobController({
             jclProcessor: jclProcessor,
             jobRepository: jobRepository
@@ -38,26 +56,29 @@ describe('JobController Module', function () {
     
     describe('when asked to submit a job', function () {
         
-        var jobCtrlTask, resolvedValue, jobSubmission, testJobOutput, 
-        testUser, testPass, testJobBody;
-        var expectedJob;
+        var jobCtrlTask, resolvedValue;
+        var testUser, testPass, testJobBody, expectedJob;
         
-        beforeEach(function () {
+        beforeEach(function (done) {
             
             // Assemble test values
             testUser = 'KC00000';
             testPass = '12345';
             testJobBody = 'JCL';
-            testJobOutput = 'Some random Job Text';
+            
             expectedJob = new Job({
                 user: testUser,
                 body: testJobBody,
                 output: testJobOutput
             });
-            
+
             // Act
             jobCtrlTask = jobController
-                .submitJob(testJobBody, testUser, testPass);
+                .submitJob(testJobBody, testUser, testPass)
+                .then(function (value){
+                    resolvedValue = value;
+                    done();
+                });
         });
         
         
@@ -70,47 +91,36 @@ describe('JobController Module', function () {
                 .toHaveBeenCalledWith(testJobBody, testUser, testPass);
         });
         
-        describe('after the job completes', function () {
-        
-            beforeEach(function (done) {
-                
-                jclProcessorTask.resolve(testJobOutput);
-
-                // Check resolved value of jobController.submitJob
-                jobCtrlTask.then(function (value){
-                    resolvedValue = value;
-                    done();
-                });
-            });
+        it('should persist the job', function () {
             
-            it('should persist the job', function () {
+            expect(jobRepository.saveJob)
+                .toHaveBeenCalled();
+            
+            var receivedJob = jobRepository.saveJob
+                .mostRecentCall.args[0]
                 
-                expect(jobRepository.saveJob)
-                    .toHaveBeenCalled();
+            expect(receivedJob.output)
+                .toEqual(testJobOutput);
                 
-                var receivedJob = jobRepository.saveJob
-                    .mostRecentCall.args[0]
-                    
-                expect(receivedJob.output)
-                    .toEqual(testJobOutput);
-                    
-                expect(receivedJob.body)
-                    .toEqual(testJobBody);
-                    
-                expect(receivedJob.user)
-                    .toEqual(testUser);
-            });
+            expect(receivedJob.body)
+                .toEqual(testJobBody);
+                
+            expect(receivedJob.user)
+                .toEqual(testUser);
+        });
         
-            it('should resolve the completed job', function () {
-                expect(resolvedValue.output)
-                    .toEqual(testJobOutput);
-                    
-                expect(resolvedValue.body)
-                    .toEqual(testJobBody);
-                    
-                expect(resolvedValue.user)
-                    .toEqual(testUser);
-            });
+        it('should resolve the completed job', function () {
+            expect(resolvedValue.id)
+                .toEqual(testDBId);
+            
+            expect(resolvedValue.output)
+                .toEqual(testJobOutput);
+                
+            expect(resolvedValue.body)
+                .toEqual(testJobBody);
+                
+            expect(resolvedValue.user)
+                .toEqual(testUser);
         });
     });
 
@@ -152,6 +162,7 @@ describe('JobController Module', function () {
     });
 
     describe('when asked for a job by id', function () {
+        
         var getJobTask, getJobByIdRepoTask;
         var testId = 102;
         var testJob = { 'jov': 'jov'};

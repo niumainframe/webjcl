@@ -10,11 +10,14 @@ var root = '..'
 
 var JobController = require(root + '/framework/JobController');
 var JobRepository = require(root + '/framework/JobRepository');
+var mongo = require(root + '/mongo');
 var JclProcessor = require(root + '/framework/JclProcessor');
 var FtpBasicAuth = require(root + '/middleware').FtpBasicAuth
 var JobsApi = require(root + '/http/JobsApi');
 
-var jobRepository = new JobRepository();
+var jobRepository = new JobRepository({
+    mongoDb: mongo
+    });
 var jclProcessor = new JclProcessor();
 var credentialsTTL = 30 * 60;
 var ftpBasicAuth = FtpBasicAuth('localhost', '2121', credentialsTTL);

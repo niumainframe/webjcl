@@ -7,8 +7,6 @@ function Job (params) {
     this.body = params.body || null;
     this.output = params.output || null;
     this.date = params.date || new Date();
-    
-    Object.seal(this)
 }
 
 module.exports = Job;
