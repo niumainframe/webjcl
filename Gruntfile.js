@@ -5,8 +5,17 @@ module.exports = function(grunt) {
         
         pkg: grunt.file.readJSON('package.json'),
         
+        unit: {},
         
         jasmine_node: {
+            
+            all: {
+                
+                specNameMatcher: "spec", // load only specs containing specNameMatcher
+                specFolders: ['./tests'],
+                requirejs: false,
+                forceExit: false
+            },
             
             integration: {
                 
@@ -18,7 +27,8 @@ module.exports = function(grunt) {
                 specNameMatcher: "spec", // load only specs containing specNameMatcher
                 specFolders: [
                     './tests/integration',
-                    './tests/v2/integration'
+                    './tests/v2/integration',
+                    './tests/v2/E2E'
                 ],
                 requirejs: false,
                 forceExit: false
@@ -32,34 +42,15 @@ module.exports = function(grunt) {
                 requirejs: false,
                 forceExit: false
             },
-            
-            E2E: {
-                specNameMatcher: "Spec",
-                specFolders: [
-                    './tests/v2/E2E'
-                    ],
-                requirejs: false,
-                forceExit: false
-                
-            },
-            
-            refactor_tests: {
-                
-                specNameMatcher: "Spec",
-                specFolders: [
-                    './tests/v2/unit'
-                ],
-                requirejs: false,
-                forceExit: false
-            }
         }
-        
-        
     });
 
     grunt.loadNpmTasks('grunt-jasmine-node');
 
     // Default task(s).
-    grunt.registerTask('default', ['jasmine_node']);
+    grunt.registerTask('test', ['jasmine_node:all']);
+    grunt.registerTask('test:integration', ['jasmine_node:integration']);
+    grunt.registerTask('test:unit', ['jasmine_node:unit']);
+    grunt.registerTask('default', ['test']); 
 
 };

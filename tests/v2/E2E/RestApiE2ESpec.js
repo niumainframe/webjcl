@@ -55,7 +55,6 @@ describe('WebJCL REST API E2E Tests', function () {
                 auth: { user: user, pass: pass }
         })
         .expectStatus(200)
-        .inspectBody()
         .toss();
         
 });

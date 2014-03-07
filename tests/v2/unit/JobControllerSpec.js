@@ -11,7 +11,7 @@ var Job = require(root + '/models/Job.js');
 describe('JobController Module', function () {
     var jobController, 
     jclProcessor, jobRepository,
-    jclProcessorTask, deferred;
+    jclProcessorTask;
     
     beforeEach(function () {
         
@@ -38,24 +38,28 @@ describe('JobController Module', function () {
     
     describe('when asked to submit a job', function () {
         
-        var jobCtrlTask, jobCtrlTaskResolvedVal, jobSubmission, processedJob, 
-        un, pw, body;
+        var jobCtrlTask, resolvedValue, jobSubmission, testJobOutput, 
+        testUser, testPass, testJobBody;
+        var expectedJob;
         
         beforeEach(function () {
             
-            un = 'KC00000';
-            pw = '12345';
-            body = 'JCL';
-            processedJob = new Job({
-               user: un,
-               body: body,
-               output: 'fooo'
+            // Assemble test values
+            testUser = 'KC00000';
+            testPass = '12345';
+            testJobBody = 'JCL';
+            testJobOutput = 'Some random Job Text';
+            expectedJob = new Job({
+                user: testUser,
+                body: testJobBody,
+                output: testJobOutput
             });
             
             // Act
             jobCtrlTask = jobController
-                .submitJob(body, un, pw);
+                .submitJob(testJobBody, testUser, testPass);
         });
+        
         
         it('should return a promise', function () {
             expect(jobCtrlTask.then).toBeDefined();
@@ -63,29 +67,49 @@ describe('JobController Module', function () {
         
         it('should submit the job to the JclProcessor', function () {
             expect(jclProcessor.submitJob)
-                .toHaveBeenCalledWith(body, un, pw);
+                .toHaveBeenCalledWith(testJobBody, testUser, testPass);
         });
         
         describe('after the job completes', function () {
         
             beforeEach(function (done) {
                 
-                jclProcessorTask.resolve(processedJob);
+                jclProcessorTask.resolve(testJobOutput);
 
                 // Check resolved value of jobController.submitJob
                 jobCtrlTask.then(function (value){
-                    jobCtrlTaskResolvedVal = value;
+                    resolvedValue = value;
                     done();
                 });
             });
-        
+            
             it('should persist the job', function () {
+                
                 expect(jobRepository.saveJob)
-                    .toHaveBeenCalledWith(processedJob);
+                    .toHaveBeenCalled();
+                
+                var receivedJob = jobRepository.saveJob
+                    .mostRecentCall.args[0]
+                    
+                expect(receivedJob.output)
+                    .toEqual(testJobOutput);
+                    
+                expect(receivedJob.body)
+                    .toEqual(testJobBody);
+                    
+                expect(receivedJob.user)
+                    .toEqual(testUser);
             });
         
             it('should resolve the completed job', function () {
-                expect(jobCtrlTaskResolvedVal).toBe(processedJob)
+                expect(resolvedValue.output)
+                    .toEqual(testJobOutput);
+                    
+                expect(resolvedValue.body)
+                    .toEqual(testJobBody);
+                    
+                expect(resolvedValue.user)
+                    .toEqual(testUser);
             });
         });
     });

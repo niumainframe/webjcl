@@ -1,4 +1,5 @@
 var Q = require('q');
+var Job = require('../models/Job');
 
 var JobController = function (config) {
     
@@ -20,10 +21,17 @@ JobController.prototype.submitJob = function (body, un, pw) {
     
     this.jclProcessor.submitJob(body, un, pw)
         .then(function (completedJob) {
-
-            self.jobRepository.saveJob(completedJob);
             
-            ourDefer.resolve(completedJob);
+            // Generate Job Model
+            var job = new Job({
+                output: completedJob,
+                body: body,
+                user: un
+            });
+            
+            self.jobRepository.saveJob(job);
+            
+            ourDefer.resolve(job);
         });
     
     return ourDefer.promise;
