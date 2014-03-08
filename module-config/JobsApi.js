@@ -4,9 +4,9 @@
  * express app for production use.
  */ 
  
-var exp = require('express');
 
 var root = '..'
+var config = require(root + '/config.js');
 
 var JobController = require(root + '/framework/JobController');
 var JobRepository = require(root + '/framework/JobRepository');
@@ -15,17 +15,25 @@ var JclProcessor = require(root + '/framework/JclProcessor');
 var FtpBasicAuth = require(root + '/middleware').FtpBasicAuth
 var JobsApi = require(root + '/http/JobsApi');
 
+
+
 var jobRepository = new JobRepository({
     mongoDb: mongo
     });
-var jclProcessor = new JclProcessor();
+    
+var jclProcessor = new JclProcessor({
+        host: config.ftpHost,
+        port: config.ftpPort
+    });
+
 var credentialsTTL = 30 * 60;
-var ftpBasicAuth = FtpBasicAuth('localhost', '2121', credentialsTTL);
+var ftpBasicAuth = FtpBasicAuth(config.ftpHost, 
+    config.ftpPort, credentialsTTL);
 
 var jobController = new JobController({
         jclProcessor: jclProcessor,
         jobRepository: jobRepository
-    })
+    });
 
 var configuredJobsApi = JobsApi({
     jobController: jobController,

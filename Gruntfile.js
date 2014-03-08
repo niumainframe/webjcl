@@ -1,3 +1,5 @@
+var webjclConfig = require('./config.js');
+
 module.exports = function(grunt) {
 
     // Project configuration.
@@ -10,8 +12,7 @@ module.exports = function(grunt) {
         jasmine_node: {
             
             all: {
-                
-                specNameMatcher: "spec", // load only specs containing specNameMatcher
+                specNameMatcher: "spec", 
                 specFolders: ['./tests'],
                 requirejs: false,
                 forceExit: false
@@ -19,12 +20,12 @@ module.exports = function(grunt) {
             
             integration: {
                 
-                apiEndpoint: "http://localhost:8000",
+                apiEndpoint: "http://localhost:" + webjclConfig.httpPort,
                 auth: { user: "goodUser", pass: "goodPass" },
-                ftpHost: 'localhost',
-                ftpPort: '2121',
+                ftpHost: webjclConfig.ftpHost,
+                ftpPort: webjclConfig.ftpPort,
                 
-                specNameMatcher: "spec", // load only specs containing specNameMatcher
+                specNameMatcher: "spec", 
                 specFolders: [
                     './tests/integration',
                     './tests/v2/integration',

@@ -43,6 +43,8 @@ function JobsApi(config) {
                 .then(function (job) {
                     res.set('last-modified', job.date.toUTCString());
                     res.send(job);
+                }, function(err) {
+                    res.send(err, 400);
                 });
     });
 

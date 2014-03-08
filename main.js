@@ -18,24 +18,9 @@ console.log("Starting WebJCL " + package.version);
 
 var app = express();
 
-// Start HTTPS server if configuration is there.
-if (config.ssl_key != undefined && config.ssl_cert != undefined)
-{
-	
-	console.log("Loading SSL Certificates");
-	
-	var https_options = {};
-	
-	https_options.key = fs.readFileSync(config.ssl_key).toString();
-	https_options.cert = fs.readFileSync(config.ssl_cert).toString();
-	
-	var ssl_server = https.createServer(https_options, app).listen(config.ssl_port);
-	
-}
-
 
 // Start HTTP server
-var server = http.createServer(app).listen(config.port);
+var server = http.createServer(app).listen(config.httpPort);
 
 //
 //

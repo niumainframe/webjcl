@@ -51,14 +51,8 @@ describe('WebJCL Jobs API', function () {
         
         jobController = Object.create(JobController.prototype);
         
-        // Have jobController.submitJob resolve a mocked job
-        var deferred = Q.defer();
-        deferred.resolve(testJob);
-        spyOn(jobController, 'submitJob')
-            .andReturn(deferred.promise);
-        
         // Have jobController.listJobs resolve a mocked job list
-        deferred = Q.defer();
+        var deferred = Q.defer();
         deferred.resolve(testJobList);
         spyOn(jobController, 'listJobs')
             .andReturn(deferred.promise);
@@ -153,37 +147,90 @@ describe('WebJCL Jobs API', function () {
 
         
     describe('Posting a job', function (done) {
-        
+        var submitJobDeferred;
         var payload = testJob.body;
         
-        beforeEach(function (done) {
-            act(done);
+        beforeEach(function () {
+            
+            // Have jobController.submitJob return a deferred promise.
+            submitJobDeferred = Q.defer();
+            spyOn(jobController, 'submitJob')
+                .andReturn(submitJobDeferred.promise);
         });
         
-        var postFrisby = frisby.create('with good credentials')
-            .post(host + '/jobs', null, {
-                headers: {
-                    'content-type': 'text/plain'
-                },
-                body: testJob.body,
-                auth: { user: creds.user, pass: creds.pass }
-            })
-            .expectStatus(200)
-            .expectJSON(jobJsonVerifier)
-            .expectHeaderContains('Last-Modified', 'Sat, 01 Nov 2042 14:29:00 GMT');
+        describe('with bad credentials', function () {
+            beforeEach(function (done) {
+                act(done);
+            });
+            frisby.create('with bad credentials')
+                .post(host + '/jobs', null, {
+                    auth: { user: creds.user+'bad', pass: creds.pass }
+                })
+                .expectStatus(401)
+                .toss();
             
-            postFrisby.current.expects.push(function(){
-                expect(jobController.submitJob)
-                    .toHaveBeenCalledWith(payload, creds.user, creds.pass);
+        });
+        
+        describe('when the job successfully processes', function () {
+            beforeEach(function (done) {
+                
+                submitJobDeferred.resolve(testJob);
+                
+                act(done);
             });
             
-            postFrisby.toss();
+            var postFrisby = frisby.create('submit job')
+                .post(host + '/jobs', null, {
+                    headers: {
+                        'content-type': 'text/plain'
+                    },
+                    body: testJob.body,
+                    auth: { user: creds.user, pass: creds.pass }
+                })
+                .expectStatus(200)
+                .expectJSON(jobJsonVerifier)
+                .expectHeaderContains('Last-Modified', 'Sat, 01 Nov 2042 14:29:00 GMT');
+                
+                postFrisby.current.expects.push(function(){
+                    expect(jobController.submitJob)
+                        .toHaveBeenCalledWith(payload, creds.user, creds.pass);
+                });
+                
+                postFrisby.toss();
             
-        frisby.create('with bad credentials')
-            .post(host + '/jobs', null, {
-                auth: { user: creds.user+'bad', pass: creds.pass }
-            })
-            .expectStatus(401)
-            .toss();
+        });
+        
+        describe('when the job unsuccessfully processes', function () {
+            
+            beforeEach(function (done) {
+                submitJobDeferred.reject('Its an error');
+                //submitJobDeferred.reject('There was an error...');
+                act(done);
+            });
+            
+            
+            var postFrisby = frisby.create('submit job')
+                .post(host + '/jobs', null, {
+                    headers: {
+                        'content-type': 'text/plain'
+                    },
+                    body: testJob.body,
+                    auth: { user: creds.user, pass: creds.pass }
+                })
+                .expectHeaderContains('content-type', 'text/html')
+                .expectStatus(400)
+                
+                postFrisby.current.expects.push(function(){
+                    expect(jobController.submitJob)
+                        .toHaveBeenCalledWith(payload, creds.user, creds.pass);
+                });
+                
+                postFrisby.toss();
+            
+            
+        });
+
+        
+
     });
 });

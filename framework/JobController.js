@@ -34,6 +34,10 @@ JobController.prototype.submitJob = function (body, un, pw) {
                     job.id = savedJobID;
                     ourDefer.resolve(job);
                 });
+        }, function(error) {
+            
+            ourDefer.reject(error);
+            
         });
         
     
