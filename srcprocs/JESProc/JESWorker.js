@@ -188,6 +188,7 @@ JESWorker.prototype._writeJobFiles = function(callback)
 		{
 			var host = self.host || config.host;
 			var port = self.port || config.port;
+
 			// Write the credentials config to the workspace.
 			fs.writeFile(self._configFile, 
 			"[JESftp]\n" +
@@ -365,7 +366,7 @@ JESWorker.prototype.start = function(callback)
 			self.completion = ISrcProcJob.completion.success;
 			
 			// Emit our doneness
-			self.emit(ISrcProcJob.statusCode.done, this);
+			self.emit(ISrcProcJob.statusCode.done, self);
 			
 			// Clean everything up
 			self._destroyWorkspace();

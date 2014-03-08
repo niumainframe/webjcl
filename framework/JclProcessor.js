@@ -7,8 +7,10 @@ var ISrcProcJob = require('../framework/ISrcProcJob.js');
 function JclProcessor (config) {
     
     config = config || {};
-    this.host = config.host;
-    this.port = config.port;
+    this.host = config.host || 
+        console.warn('JclProcessor configured with no host!');
+    this.port = config.port ||
+        console.warn('JclProcessor configured with no port!');
     
 }
 
@@ -46,7 +48,7 @@ JclProcessor.prototype.submitJob = function (body, user, pass) {
 
 
     // Gather results and send it back when it's done.
-    worker.once(ISrcProcJob.statusCode.done, function() {
+    worker.once(ISrcProcJob.statusCode.done, function(worker) {
         
         var jobOutput = worker.outputFiles[0].data;
         
