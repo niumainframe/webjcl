@@ -3,9 +3,11 @@ language: node_js
 node_js:
     - "0.10"
 
-install:
+services: mongodb
+
+before_install:
     - sudo pip install git+https://github.com/scvnc/pyftpdlib-mod.git@b7f5cd867b8ef491131d169e465f3ebd732733dd
     - sudo pip install git+https://github.com/niumainframe/ZosFtpMock.git@4f03c78ffef44e079543199250ab7691d0cf5f7c
-
+    
 before_script:
     - zosftpd.py -p 2121 -C goodUser:goodPass &
