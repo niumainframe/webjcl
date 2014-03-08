@@ -38,6 +38,12 @@ function JobsApi(config) {
     });
 
     app.post('/jobs', function (req, res) {
+        
+            if(!req.is('text/plain')) {
+                res.send(415, "This only accepts 'text/plain'");
+                return;
+            }
+        
             jobController
                 .submitJob(req.body, req.user, req.auth.password)
                 .then(function (job) {

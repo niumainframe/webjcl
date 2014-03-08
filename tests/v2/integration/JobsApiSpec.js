@@ -158,15 +158,27 @@ describe('WebJCL Jobs API', function () {
                 .andReturn(submitJobDeferred.promise);
         });
         
-        describe('with bad credentials', function () {
+        describe('irregardless of job success', function () {
             beforeEach(function (done) {
                 act(done);
             });
-            frisby.create('with bad credentials')
+            
+            frisby.create('with bad credentials should fail')
                 .post(host + '/jobs', null, {
                     auth: { user: creds.user+'bad', pass: creds.pass }
                 })
                 .expectStatus(401)
+                .toss();
+                
+            frisby.create('Non text/plain content-type should fail')
+                .post(host + '/jobs', null, {
+                    body: payload,
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    auth: { user: creds.user, pass: creds.pass }
+                })
+                .expectStatus(415) //Unsupported Media Type
                 .toss();
             
         });
