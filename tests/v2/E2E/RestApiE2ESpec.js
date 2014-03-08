@@ -33,6 +33,12 @@ describe('WebJCL REST API E2E Tests', function () {
         });
     });
 
+    frisby.create('The client should be available on /')
+        .get(host + '/')
+        .expectStatus(200)
+        .expectHeaderContains('Content-Type', 'text/html')
+        .toss();
+
 
     frisby.create('Submit Job')
         .post(host + mount + '/jobs', null, {
