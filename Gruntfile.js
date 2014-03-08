@@ -15,7 +15,7 @@ module.exports = function(grunt) {
                 specNameMatcher: "spec", 
                 specFolders: ['./tests'],
                 requirejs: false,
-                forceExit: false
+                forceExit: true
             },
             
             integration: {
@@ -32,7 +32,7 @@ module.exports = function(grunt) {
                     './tests/v2/E2E'
                 ],
                 requirejs: false,
-                forceExit: false
+                forceExit: true
             },
             
             unit: {
@@ -41,7 +41,7 @@ module.exports = function(grunt) {
                     './tests/v2/unit'
                     ],
                 requirejs: false,
-                forceExit: false
+                forceExit: true
             },
         }
     });

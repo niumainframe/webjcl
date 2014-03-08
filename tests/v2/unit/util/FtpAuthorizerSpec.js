@@ -12,10 +12,13 @@ describe('The FTP Authenticaton Factory', function () {
     
     beforeEach(function () {
         
-        ftpClient = new JSFtp({
-                host: 'server',
-                port: 'port'
-            });
+        // Make our own stubbed JSFtp client.
+        ftpClient = { 
+            auth: function(){}, 
+            raw: {
+                quit: function(){}
+            }
+        };
             
         spyOn(ftpClient, 'auth')
             .andCallFake(function (user, pass, callback) {
