@@ -201,7 +201,7 @@ describe('WebJCL Jobs API', function () {
                 })
                 .expectStatus(200)
                 .expectJSON(jobJsonVerifier)
-                .expectHeaderContains('Last-Modified', 'Sat, 01 Nov 2042 14:29:00 GMT');
+                .expectHeaderContains('Last-Modified', testJob.date.toGMTString());
                 
                 postFrisby.current.expects.push(function(){
                     expect(jobController.submitJob)
