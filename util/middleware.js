@@ -3,11 +3,13 @@ var express = require('express');
 var parseTextBody = require('body');
 var Q = require('q');
 var ftp = require('ftp');
-var middleware = {};
-
-var FtpAuthenticator = require('./util/FtpAuthenticator');
-var JSFtpFactory = require('./util/JSFtpFactory.js');
 var NodeCache = require('node-cache')
+
+var FtpAuthenticator = require('./FtpAuthenticator');
+var JSFtpFactory = require('./JSFtpFactory.js');
+
+
+var middleware = {};
 
 middleware.FtpBasicAuth = function (host, port, cacheTime) {
     
@@ -28,7 +30,7 @@ middleware.textBodyParser = function (req, res, next) {
         next();
         return;
     }
-        
+        middleware.js
     parseTextBody(req, res, function (err, body) {
         req.body = body;
         next();

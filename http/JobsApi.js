@@ -2,7 +2,7 @@ var root = '..'
 var express = require('express');
 var textBody = require('body');
 
-var middleware = require(root + '/middleware.js');
+var middleware = require(root + '/util/middleware.js');
 
 /**
  * JobsApi

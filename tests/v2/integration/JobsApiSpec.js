@@ -9,7 +9,7 @@ var frisby = require('frisby');
 var WebJclApi = require(root + '/http/JobsApi.js');
 var JobController = require(root + '/framework/JobController.js');
 var Job = require(root + '/models/Job.js');
-var middleware = require(root + '/middleware');
+var middleware = require(root + '/util/middleware');
 
 frisby.globalSetup({ timeout: 10000 });
 
