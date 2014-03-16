@@ -1,6 +1,6 @@
 # WebJCL
 
-![WebJCL Screenshot](http://niumainframe.github.io/webjcl/images/webjcl-screenshot.png) 
+[![Build Status](https://travis-ci.org/niumainframe/webjcl.png?branch=master)](https://travis-ci.org/niumainframe/webjcl)
 
 
 WebJCL is a web-based development environment for programming with IBM mainframe. It allows students to code and execute IBM assembler completely through the web-browser.  This was developed during an independent study between students at Northern Illinois University.  The server-side source code is currently written in node.js.
