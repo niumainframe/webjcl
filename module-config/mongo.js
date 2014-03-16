@@ -1,5 +1,10 @@
+/**
+ * This module should provide a singleton database reference to MongoDB.
+ */
+
+var root = '..';
 var mongodb = require("mongodb");
-var config  = require("./config.js").mongodb;
+var config  = require(root + "/config.js").mongodb;
 
 
 var server_options = { auto_reconnect: true };

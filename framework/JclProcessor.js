@@ -1,7 +1,8 @@
+var root = '..'
 var Q = require('q');
 
-var JESWorker = require('../srcprocs/JESProc/JESWorker.js');
-var ISrcProcJob = require('../framework/ISrcProcJob.js');
+var JESWorker = require(root + '/framework/JESWorker/JESWorker.js');
+var ISrcProcJob = require(root+ '/framework/JESWorker/ISrcProcJob.js');
 
 
 function JclProcessor (config) {

@@ -10,7 +10,7 @@ var config = require(root + '/config.js');
 
 var JobController = require(root + '/framework/JobController');
 var JobRepository = require(root + '/framework/JobRepository');
-var mongo = require(root + '/mongo');
+var mongo = require(root + '/module-config/mongo');
 var JclProcessor = require(root + '/framework/JclProcessor');
 var FtpBasicAuth = require(root + '/util/middleware').FtpBasicAuth
 var JobsApi = require(root + '/http/JobsApi');

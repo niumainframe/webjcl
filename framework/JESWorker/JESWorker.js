@@ -4,11 +4,10 @@ var path = require('path');
 var uuid = require('node-uuid');
 var spawn = require('child_process').spawn;
 var async = require('async');
-var config = require('./config.js');
 
 
 
-var ISrcProcJob = require('../../framework/ISrcProcJob.js');
+var ISrcProcJob = require('./ISrcProcJob.js');
 
 // Strict umask
 process.umask(0077)
@@ -186,8 +185,8 @@ JESWorker.prototype._writeJobFiles = function(callback)
 		
 		function(next)
 		{
-			var host = self.host || config.host;
-			var port = self.port || config.port;
+			var host = self.host;
+			var port = self.port;
 
 			// Write the credentials config to the workspace.
 			fs.writeFile(self._configFile, 
