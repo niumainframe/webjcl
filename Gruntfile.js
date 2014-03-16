@@ -27,7 +27,6 @@ module.exports = function(grunt) {
                 
                 specNameMatcher: "spec", 
                 specFolders: [
-                    './tests/integration',
                     './tests/v2/integration',
                     './tests/v2/E2E'
                 ],

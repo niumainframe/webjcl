@@ -1,5 +1,5 @@
 'use strict';
-var root = '../../..';
+var root = '../..';
 
 var http = require('http');
 var express = require('express');

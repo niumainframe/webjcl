@@ -1,4 +1,4 @@
-var root = '../../../..';
+var root = '../../..';
 var FtpAuthenticator = require(root + '/util/FtpAuthenticator.js');
 
 var JSFtp = require('jsftp');

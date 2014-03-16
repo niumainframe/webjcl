@@ -1,4 +1,4 @@
-var root = '../../..'
+var root = '../..'
 
 var grunt = require('grunt');
 var JclProcessor = require(root + '/framework/JclProcessor.js');

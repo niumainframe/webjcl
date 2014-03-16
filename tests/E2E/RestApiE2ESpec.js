@@ -1,4 +1,4 @@
-var root = '../../..';
+var root = '../..';
 var frisby = require('frisby');
 var grunt = require('grunt');
 var http = require('http');

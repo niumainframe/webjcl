@@ -1,5 +1,5 @@
 'use strict';
-var root = '../../..';
+var root = '../..';
 
 var Q = require('q')
 

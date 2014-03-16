@@ -1,5 +1,5 @@
 'use strict';
-var root = '../../..';
+var root = '../..';
 
 var JobRepository = require(root + '/framework/JobRepository.js');
 var Job = require(root + '/models/Job');
