@@ -366,8 +366,8 @@ font-size:.9em;
 
 
 .panelBox.codeBox > .body > .tabsContainer > ul > li.selected{
-	background:#ADCF82;
-	box-shadow: inset 0px 0px 0px 1px #d3eEb0, inset 0px 0px 1em #C5ED91;
+	background:#FF0000;
+	box-shadow: inset 0px 0px 0px 1px #d3eEb0, inset 0px 0px 1em #00FF00;
 }
 
 .panelBox.codeBox > .body > div.content{
