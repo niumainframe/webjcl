@@ -27,7 +27,7 @@ border-left: 0px;\
 border-bottom: 1px solid #FFFFFF\
 }\
 .ace-webjcl .ace_marker-layer .ace_selection {\
-background: #d3eEb0\
+background: #a6a2a1\
 }\
 .ace-webjcl.ace_multiselect .ace_selection.ace_start {\
 box-shadow: 0 0 3px 0px #002451;\
@@ -47,7 +47,7 @@ background: #d3eEb0\
 background-color: #c3dEa0\
 }\
 .ace-webjcl .ace_marker-layer .ace_selected-word {\
-border: 1px solid #d3eEb0\
+border: 1px solid #a6a2a1\
 }\
 .ace-webjcl .ace_invisible {\
 color: #404F7D\
