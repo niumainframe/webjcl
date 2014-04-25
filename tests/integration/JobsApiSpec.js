@@ -160,6 +160,9 @@ describe('WebJCL Jobs API', function () {
         
         describe('irregardless of job success', function () {
             beforeEach(function (done) {
+                
+                submitJobDeferred.resolve(testJob);
+                
                 act(done);
             });
             
@@ -180,6 +183,18 @@ describe('WebJCL Jobs API', function () {
                 })
                 .expectStatus(415) //Unsupported Media Type
                 .toss();
+            
+            frisby.create('Composite plain/text content-type header should succeed (FF behavior)')
+                .post(host + '/jobs', null, {
+                    body: payload,
+                    headers: {
+                        'content-type': 'text/plain; charset=UTF-8'
+                    },
+                    auth: { user: creds.user, pass: creds.pass }
+                })
+                .expectStatus(200)
+                .toss();
+                
             
         });
         

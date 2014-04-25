@@ -26,11 +26,11 @@ middleware.FtpBasicAuth = function (host, port, cacheTime) {
 
 middleware.textBodyParser = function (req, res, next) {
     
-    if(req.headers['content-type'] != 'text/plain') {
+    if(!req.is('text/plain')) {
         next();
         return;
     }
-        middleware.js
+    
     parseTextBody(req, res, function (err, body) {
         req.body = body;
         next();
