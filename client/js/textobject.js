@@ -37,9 +37,26 @@ TextObjectManager.prototype.createTextObject = function(name){
 	if(this.__activeTab){
 		this.__activeTab.hide();
 	}
-	this.__TextObjectArray[this.__TextObjectIndex] = new TextObject(this.__id + this.__TextObjectIndex, name, this.__panel, this.__TextObjectIndex);
+    
+	// Add a new tab associated with a TextObject
+	var textObject = new TextObject(this.__id + this.__TextObjectIndex, name, this.__panel, this.__TextObjectIndex);
+	this.__TextObjectArray[this.__TextObjectIndex] = textObject;
 	this.__activeTab = this.__TextObjectArray[this.__TextObjectIndex];
 	this.__TextObjectIndex++;
+	
+	
+	// Register listener when the selection changes
+	var aceEditor = textObject.editor;
+	
+	aceEditor.on("changeSelection", function () {
+		
+		// Obtain column position (w offset)
+		var column = aceEditor.getCursorPosition().column + 1;
+	    
+	    // Update column div
+		$('#colCounter').html('Column: ' + column)
+	});
+	
 	
 	return this.__TextObjectIndex;
 }
