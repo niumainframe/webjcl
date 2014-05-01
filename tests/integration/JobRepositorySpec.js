@@ -114,17 +114,24 @@ describe('JobRepository (integrated with MongoDB)', function () {
         
 
     });
-    
+    var Q = require('q');
     describe('Listing a user\'s jobs.', function () {
         
         var jobList;
         
         beforeEach(function (done) {
             
-            jobRepository.getJobsByUser(testJob.user)
-            .then(function (jobs) {
-                jobList = jobs;
-                done();
+            Q.all([
+                jobRepository.saveJob(new Job({user: testJob.user})),
+                jobRepository.saveJob(new Job({user: testJob.user, 
+                    output: 'the last one in'}))
+            ]).then(function () {
+                
+                jobRepository.getJobsByUser(testJob.user)
+                    .then(function (jobs) {
+                        jobList = jobs;
+                        done();
+                    });
             });
         
         });
@@ -140,5 +147,11 @@ describe('JobRepository (integrated with MongoDB)', function () {
                 expect(job._id).not.toBeDefined();
             });
         });
+        
+        it('should return date in decending order', function () {
+            expect(jobList[0].output)
+                .toBe('the last one in');
+        });
+        
     });
 });

@@ -18,6 +18,12 @@ JobRepository.prototype.saveJob = function (job) {
     
     this.db.collection('Jobs', {safe:true}, function (err, coll) {
         coll.insert(job, function (err, record) {
+            
+            if(err) {
+                deferred.reject(err)
+                return;
+            }
+            
             var savedJob = record[0];
             savedJob.id = savedJob._id;
             delete savedJob._id;
@@ -33,7 +39,7 @@ JobRepository.prototype.getJobsByUser = function (user) {
     var deferred = Q.defer();
     
     var selector = {user: user};
-    var queryOpts = {limit: 5, sort: {id:-1}};
+    var queryOpts = {limit: 5, sort: [['_id', 'desc']]};
     
     this.db.collection('Jobs', {safe:true}, function (err, coll) {
         coll.find(selector, queryOpts, function(err, result) {
