@@ -371,7 +371,7 @@ JESWorker.prototype.start = function(callback)
 			self._destroyWorkspace();
 			
 			// Exit
-			callback();
+			callback(outdata);
 			
 			
 		});

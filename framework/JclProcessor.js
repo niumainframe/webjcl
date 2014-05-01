@@ -44,24 +44,23 @@ JclProcessor.prototype.submitJob = function (body, user, pass) {
     
     // Start the worker once it's 'ready.'
     worker.once(ISrcProcJob.statusCode.ready, function() {
-       worker.start(function(){});
+        worker.start(function(output){
+            // Then handle the output.
+            var jobOutput = worker.outputFiles[0].data;
+
+            // Send back the python output in the error case.
+            if(!jobOutput) {
+                deferred.reject(worker.output);
+                return;
+            }
+
+            // Resolve the job output if we're good.
+            deferred.resolve(output);
+           
+        });
     });
 
-
-    // Gather results and send it back when it's done.
-    worker.once(ISrcProcJob.statusCode.done, function(worker) {
-        
-        var jobOutput = worker.outputFiles[0].data;
-        
-        // Send back the python output in the error case.
-        if(!jobOutput) {
-            deferred.reject(worker.output);
-            return;
-        }
-        
-        // Resolve the jobOutput if we're good.
-        deferred.resolve(jobOutput);
-    });
+    
     
     return deferred.promise;
 }
