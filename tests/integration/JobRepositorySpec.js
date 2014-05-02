@@ -121,19 +121,24 @@ describe('JobRepository (integrated with MongoDB)', function () {
         
         beforeEach(function (done) {
             
-            Q.all([
-                jobRepository.saveJob(new Job({user: testJob.user})),
-                jobRepository.saveJob(new Job({user: testJob.user, 
-                    output: 'the last one in'}))
-            ]).then(function () {
-                
-                jobRepository.getJobsByUser(testJob.user)
-                    .then(function (jobs) {
-                        jobList = jobs;
-                        done();
-                    });
-            });
-        
+            // Add a job
+            jobRepository.saveJob(new Job({user: testJob.user}))
+                .then(function () {
+                    
+                    // Add another job
+                    return jobRepository
+                        .saveJob(new Job({
+                            user: testJob.user, 
+                            output: 'the last one in'
+                        }));
+                })
+                .then(function () {
+                    return jobRepository.getJobsByUser(testJob.user);
+                })
+                .then(function (jobs) {
+                    jobList = jobs;
+                    done();
+                });
         });
         
         it('should have jobs in it', function () {
