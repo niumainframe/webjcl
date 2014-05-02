@@ -39,7 +39,7 @@ JobRepository.prototype.getJobsByUser = function (user) {
     var deferred = Q.defer();
     
     var selector = {user: user};
-    var queryOpts = {limit: 5, sort: [['_id', 'desc']]};
+    var queryOpts = {limit: 5, sort: [['date', 'desc']]};
     
     this.db.collection('Jobs', {safe:true}, function (err, coll) {
         coll.find(selector, queryOpts, function(err, result) {
