@@ -56,12 +56,9 @@ After obtaining the source code, you must obtain the Node.js library requirement
 There is some mandatory configuration before WebJCL can execute.
 
 * config.js
-    * Listening port (default 8000)
-    * Whether to enforce SSL (default: true)
-    * mongoDB credentials.
-
-* srcprocs/JESProc/config.js
-    * The hostname of the mainframe WebJCL connects to.
+    * Listening port
+    * The FTP host/port of the zOS mainframe.
+    * mongoDB server/credentials.
 
 ### Invoking
 
