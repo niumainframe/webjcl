@@ -1,0 +1,122 @@
+/*******************************************************
+	Instructions to install WebJCL
+
+	Created SP2014 by Noah T <noahwt@gmail.com>
+
+	Step-by-step instructions
+	Should require little skill to install a node
+
+*******************************************************/
+//Use this guide to setup an instance on AWS. I did ubuntu 12.10 as the OS
+http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-launch-instance_linux.html
+//make sure ssh (TCP port 22) is open and port TCP 80 is open
+
+************************************************************************************
+//install node.js
+//Node.js is a platform built on Chrome's JavaScript runtime for easily building
+//fast, scalable network applications. Node.js contains a built-in HTTP server library, making it
+//possible to run a web server without the use of external software.
+sudo apt-get install python-software-properties python g++ make
+sudo add-apt-repository ppa:chris-lea/node.js
+sudo apt-get update
+sudo apt-get install nodejs
+
+************************************************************************************
+//install mongoDB
+sudo apt-get install mongodb
+
+//check if mongo is running
+mongo
+//exit mongo if it loads
+exit;
+
+************************************************************************************
+//may need to install git
+sudo apt-get install git
+
+************************************************************************************
+//download github repository
+git clone https://github.com/niumainframe/webjcl.git
+
+************************************************************************************
+//After obtaining the source code, you must obtain the Node.js library requirements
+cd ~/webjcl
+npm install
+
+************************************************************************************
+//configure config.js
+nano config.js
+//I changed ssl_enforce to 'false'
+
+************************************************************************************
+//configure config.js in JESProc
+cd ~/webjcl
+nano config.js
+//change host   ex;
+"ftpHost": "zos.kctr.marist.edu",
+"ftpPort": "21",
+
+************************************************************************************
+//start node for the first time. This will not be necessary after forever is installed
+cd ~/webjcl
+//'nohup' allows it to stay running while not connected to the shell
+//Once forever is installed, nohup should never have to be used.
+nohup node main.js
+
+************************************************************************************
+//Make webJCL available on a publicly known port (80 HTTP)
+//redirect traffic on port 8000 to port 80
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8000
+
+//make iptables restore on reboot
+sudo nano /etc/rc.local
+//add line
+/home/ubuntu/iproute.sh
+//save file
+cd ~/
+nano iproute.sh
+//add line
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8000
+//save file
+chmod +x ~/iproute.sh
+
+************************************************************************************
+//install forever to allow main.js to re-start if crashed
+sudo npm install forever -g
+
+************************************************************************************
+//make forever start main.js on reboot
+cd ~/
+nano forever_webjcl.sh
+//add script below
+#!/bin/bash
+
+FOREVER_BIN=/usr/bin/forever
+WORKING_DIR=/home/ubuntu/webjcl
+
+cd $WORKING_DIR
+
+$FOREVER_BIN \
+	--sourceDir $WORKING_DIR \
+	start main.js
+//end of script above this line
+
+//make the script executable
+chmod +x ~/forever_webjcl.sh
+
+//add to run at boot
+sudo nano /etc/rc.local
+//add line
+sudo -u ubuntu -i /home/ubuntu/forever_webjcl.sh
+************************************************************************************
+//reboot server to test everything comes back up properly
+sudo reboot
+
+************************************************************************************
+//If github is ever updated run the following to get updates
+cd ~/webjcl
+git stash
+git pull
+npm install
+sudo reboot
+//You may need to reconfigure config.js as mentioned above
