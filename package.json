@@ -21,14 +21,15 @@
   },
   "dependencies": {
     "async": "0.2.x",
-    "express": "3.1.x",
-    "node-uuid": "1.4.x",
-    "mongodb": "1.2.13",
-    "ftp": "0.3.1",
-    "q": "^1.0.0",
-    "jsftp": "^1.2.1",
-    "node-cache": "^0.4.1",
     "body": "^4.4.2",
+    "express": "3.1.x",
+    "ftp": "0.3.1",
+    "jsftp": "^1.2.1",
+    "lodash": "^2.4.1",
+    "mongodb": "1.2.13",
+    "node-cache": "^0.4.1",
+    "node-uuid": "1.4.x",
+    "q": "^1.0.0",
     "winston": "^0.7.2"
   },
   "devDependencies": {
