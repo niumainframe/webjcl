@@ -1,3 +1,4 @@
 config.json
 .dotcloud
 node_modules
+.DS_Store

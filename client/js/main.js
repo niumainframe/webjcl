@@ -1,415 +1,176 @@
-var OUTPUT_COUNT = 1;
-var INPUT_COUNT = 1;
-var username = '';
-var password = '';
-var codePTO;
-var outputPTO;
+(function() {
+   angular.module('webJCL',[
+      'ui.codemirror',
+      'webJCL.JCLProcessor',
+      'webJCL.TextDownloader',
+   ])
+   .controller('MainController', MainController);
 
-var jclProcessor = new JCLProcessor();
+   MainController.$inject = ['$scope', 'JCLProcessor', 'TextDownloader'];
 
-$(document).ready(function(){
-	$('#ide-page').show();
-	$('#contentSpace').layout({
-		east__size: 600,
-		west__size: 50,
-		west__initClosed: true,
-	});
-	$('#ide-page').hide();
-	$('#account-page').show();
-	
-	
-	$('#run-button').click(function(){
-		submitJob();
-	});
-	
-	$('#account').click(function(){
-		var parent = $(this).parent();
-		if(parent.hasClass('toggled'))
-			parent.removeClass('toggled');
-		else
-			parent.addClass('toggled');
-	});
-	
-	$('#outputTabs > li').on('click', function(){
-		var item = $(this);
-		if(!item.hasClass('selected')){
-			var old_id = $('#outputTabs > .selected').removeClass().attr('data-id');
-			var new_id = item.addClass('selected').attr('data-id');
-			$('#output-' + old_id).text(output.getValue());
-			output.setValue($('#output-' + new_id).text());
-		}
-	});
-	
-	$('#ide').click(function(){
-		var e = $(this);
-		if(e.hasClass('selected') == false){
-			$('.page').hide();
-			$('#ide-page').show();
-			$('#menu').find('.selected').removeClass('selected');
-			e.addClass('selected');
-		}
-	});	
-	
-	$('#account').click(function(){
-		var e = $(this);
-		if(e.hasClass('selected') == false){
-			$('.page').hide();
-			$('#account-page').show();
-			$('#menu').find('.selected').removeClass('selected');
-			e.addClass('selected');
-		}
-	});	
-	
-	$('#feedback').click(function(){
-		var e = $(this);
-		if(e.hasClass('selected') == false){
-			$('.page').hide();
-			$('#feedback-page').show();
-			$('#menu').find('.selected').removeClass('selected');
-			e.addClass('selected');
-		}
-	});
-	
-	$('#saveAccount').click(function(e){
-		e.preventDefault();
-		if($('#username').val() == '' || $('#password').val() == ''){
-			alert("Please specify Marist ID and password.");
-			return;
-		}
-		username = $('#username').attr('disabled','disabled').val();
-		password = $('#password').attr('disabled','disabled').val();
-		
-		// Configure jclProcessor
-		jclProcessor.username = username;
-		jclProcessor.password = password;
-		
-		$('#ide').removeAttr('disabled');
-		$(this).attr('disabled','disabled');
-		$('#changeAccount').removeAttr('disabled');
-		
-		// Obtain the jobs.
-		jclProcessor.listJobs(
-			
-			// Success
-			function(jobs) {
-				
-				// For each job...
-				for(var i = jobs.length-1; i >= 0; i--) {
-					
-					jclProcessor.retrieveJob(jobs[i].id, 
-					
-						// Success
-						function(output, sub, meta){
-							
-							// Place output in a new tab.
-							var index = codePTO.createTextObject('Saved');
-							codePTO.getByIndex(index).editor.setValue(sub);
-							
-						},
-						
-						// Error
-						function(errMsg, data) {
-							
-							alert(errMsg);
-							console.log(data);
-							
-							
-						});
-					
-				}
-					
-			},
-			
-			// listJobs error.
-			function(errMsg, data) {
-				
-				alert(errMsg);
-				console.log(data);
-				
+   function MainController($scope, JCLProcessor, TextDownloader) {
+   	$scope.codemirrorOptions = {
+   		lineNumbers: true,
+   		autofocus: true,
+   		mode: 'bal',
+   		onLoad : function(_cm) {
+   			// _cm.defineSimpleMode("bal", balModeOptions);
+   		},
+   	};
+
+      $scope.run = function() {
+         JCLProcessor.processJCL($scope.input,$scope.username,$scope.password).then(function(output){
+            $scope.output = output;
+         });
+      };
+
+      $scope.generateUniqueLink = function() {
+         $scope.uniqueLink = "bbaabbabaabf";
+         // TODO uniqueLink popover should become its own directive
+         // and this setTimeout should absolutely be avoided
+         setTimeout(function(){ 
+            $('#uniqueLink').focus().select();   
+         },0);
+      };
+
+      $scope.downloadInput = function() {
+         TextDownloader.startDownloadWithText($scope.input, 'webjcl-code-');
+      };
+
+      $scope.downloadOutput = function() {
+         TextDownloader.startDownloadWithText($scope.output, 'webjcl-job-');
+      };
+
+   	$scope.input = "\
+   //KCO2298A JOB ,'CAROLYN',MSGCLASS=H\n\
+   //STEP1  EXEC PGM=ASSIST\n\
+   //STEPLIB DD DSN=KC02293.ASSIST.LOADLIB,DISP=SHR\n\
+   //SYSPRINT DD SYSOUT=*\n\
+   //SYSIN DD *\n\
+            TITLE 'PROGRAM 2'\n\
+   ***********************************************************************\n\
+   * Name:               CSCI 360 Program 2                              *\n\
+   *                                                                     *\n\
+   * Function:   This program will calculate profit for each car, total  *\n\
+   *********10****16****************34************************************\n\
+            EJECT ,\n\
+   PROGRAM2 CSECT ,                 Define PROGRAM2 as control section\n\
+            USING PROGRAM2,15       Base register is 15\n\
+   *\n\
+   * 1) Print headers for output table, zero registers\n\
+   *\n\
+            XPRNT HEADER1,47        Print ACME header\n\
+            XPRNT HEADER2,47        Print report header\n\
+            XPRNT CLMNS,73          Print column names\n\
+            XPRNT LINE,132          Print separting line of dashes\n\
+            SR    6,6               Zero total cars\n\
+            SR    7,7               Zero total cost\n\
+            SR    8,8               Zero total age\n\
+            SR    9,9               Zero total profit\n\
+   *\n\
+   * 2) Primary read of data and start loop until end of input file read\n\
+   *\n\
+            XREAD CARD,80           Read first Card\n\
+   CHECKEOF BC    B'0100',EXIT      If end of file exit the program\n\
+   *\n\
+   * 3) Process the data\n\
+   *\n\
+            XDECI 2,CARD            Read the Car stock # into Reg. 2\n\
+            XDECI 3,0(1)            Read the Price Purchased into Reg. 3\n\
+            XDECI 4,0(1)            Read the Price Sold into Reg. 4\n\
+            XDECI 5,0(1)            Read the Age into Reg. 5\n\
+   *\n\
+            LR    10,4              Load Sold price into another register\n\
+            SR    10,3              To hold the profit (SOLD-COST)\n\
+   *\n\
+            A     6,=F'1'           Increment number of total cars\n\
+            AR    7,3               Add single car cost to the total cost\n\
+            AR    8,5               Add single car age to the total age\n\
+            AR    9,10              Add single car profit to total profit\n\
+   *\n\
+   * 4) Print data for output table\n\
+   *\n\
+            XDECO 2,STOCKNUM        Put printable form stock in Printout1\n\
+            XDECO 3,COST            Put printable form cost in Printout1\n\
+            XDECO 4,SOLD            Put printable form sold in Printout1\n\
+            XDECO 5,AGE             Put printable form age in Printout1\n\
+            XDECO 10,PROFIT         Put printable form profit in Prinout1\n\
+            XPRNT PRNTOUT1,61       Print Printout1 of info for each car\n\
+   *\n\
+   * 5) Branch back to the top of the loop\n\
+   *\n\
+            XREAD CARD,80           Secondary read of card\n\
+            BC    B'1111',CHECKEOF  Go check again for end of file\n\
+   *\n\
+   * 6) Output the summary data and exit the program\n\
+   *\n\
+   EXIT     XDECO 6,TOTLCARS        Put printable form in NUMCARS\n\
+            XPRNT NUMCARS,51        Print total number of cars\n\
+            XDECO 7,TOTLCOST        Put printable form in NUMCOST\n\
+            XPRNT NUMCOST,51        Print total cost of cars\n\
+            XDECO 8,TOTLAGE         Put printable form in NUMAGE\n\
+            XPRNT NUMAGE,51         Print total age of cars\n\
+            XDECO 9,TTLPRFIT        Put printable form in NUMPRFIT\n\
+            XPRNT NUMPRFIT,51       Print total profit\n\
+            BCR   B'1111',14        End program\n\
+            LTORG\n\
+   *\n\
+   * Storage Data\n\
+   *\n\
+   CARD     DS    CL80                    Card input area\n\
+   HEADER1  DC    CL30'1'                 ACME header\n\
+            DC    C'ACME CAR COMPANY'\n\
+   HEADER2  DC    CL30' '                 Report header\n\
+            DC    C'QUARTERLY REPORT'\n\
+   CLMNS    DC    C'0STOCK #           '  Column names\n\
+            DC    C'COST               '\n\
+            DC    C'SOLD           '\n\
+            DC    C'AGE           PROFIT'\n\
+   LINE     DC    C' '                    Line of dashes\n\
+            DC    132C'-'\n\
+   *\n\
+   PRNTOUT1 DC    C'0'                    Printout each car info\n\
+   STOCKNUM DS    CL12                    storage for Stock number\n\
+   COST     DS    CL12                    storage for Cost\n\
+   SOLD     DS    CL12                    storage for Price sold\n\
+   AGE      DS    CL12                    storage for Age of car\n\
+   PROFIT   DS    CL12                    storage for Profit of car\n\
+   *\n\
+   NUMCARS  DC    CL20' '                 Print total number of cars\n\
+            DC    C'NUMBER OF CARS:   '\n\
+   TOTLCARS DS    CL12                    storage for total number of cars\n\
+   NUMCOST  DC    CL20' '                 Print total cost of all cars\n\
+            DC    C'TOTAL COST:       '\n\
+   TOTLCOST DS    CL12                    storage for total cost of cars\n\
+   NUMAGE   DC    CL20' '                 Print total age of all cars\n\
+            DC    C'TOTAL AGE:        '\n\
+   TOTLAGE  DS    CL12                    storage for total age of cars\n\
+   NUMPRFIT DC    CL20' '                 Print total profit for all cars\n\
+            DC    C'TOTAL PROFIT:     '\n\
+   TTLPRFIT DS    CL12                    storage for total profit of cars\n\
+            END PROGRAM2\n\
+   //FT05F001 DD DSN=KC02298.CSCI360.DATALIB(DATA2),DISP=SHR\n\
+   /*";
+
+   }
+})();
+
+
+$(function(){
+   $('[data-toggle="popover"]').popover();
+
+	$("#resizer").draggable({
+		axis: "x",
+		containment: '#resizer-container',
+		drag: function(event, ui) {
+			$('#inputColumn').css({
+				'width' : ui.position.left +'px',
 			});
-		
-		// Switch to IDE section by clicking it's button.
-		var ideBtn = document.getElementById("ide");
-		if (typeof ideBtn.onclick == "function") {
-			ideBtn.onclick.apply(ideBtn);
-		}
-		
-		ideBtn.click();
-		
-	});	
-	
-	$('#changeAccount').click(function(e){
-		e.preventDefault();
-		$('#username').val('').removeAttr('disabled');
-		$('#password').val('').removeAttr('disabled');
-		$('#ide').attr('disabled','disabled');
-		$(this).attr('disabled','disabled');
-		$('#saveAccount').removeAttr('disabled');
-	});
-	
-	$('.tabsContainer').mousewheel(function(event,delta){
-		var elem = $(this).find('ul.tabs');
-		if (delta > 0) {
-			if(parseInt(elem.css('left')) < 0){
-				var calc = parseInt(elem.css('left'))+40;
-				elem.css('left', calc);
-			}
-		} else {
-			var calc = parseInt(elem.css('left'))-40;
-			if(calc + elem.outerWidth() > $(this).width()-39){
-				elem.css('left', calc);
-			}
-		} 
-	}); 
-	
-	//Assign the TO managers to the respective panels.
-	codePTO = new TextObjectManager('code',$('#codePanel'));
-	outputPTO = new TextObjectManager('output',$('#outputPanel'));
-	
-	$('#new-button').click(function(e){
-		codePTO.createTextObject('Program');
-	});
-	
-	$('#save-output-button').click(function(e){
 
-		downloadActiveTO(outputPTO);
-		
-	});
-	
-	$('#save-code-button').click(function(e){
-
-		downloadActiveTO(codePTO);
-		
-	});
-	
-});
-
-
-
-
-var submitJob = function(){
-	if(username == '' || password == ''){
-		alert("Please specify Marist ID and password.");
-		return;
-	}
-	
-
-	// Set credentials.
-	jclProcessor.username = username;
-	jclProcessor.password = password;
-	
-	var textObject = codePTO.getActive();
-	if(!textObject){
-		alert("You must have an active tab in order to run a program.");
-		return;
-	}
-
-	var text = textObject.editor.getValue();
-	
-	$('#run-button').attr('disabled', 'disabled').find('i').removeClass('icon-play').addClass('icon-spinner').addClass('icon-spin');
-	
-	
-	jclProcessor.sendJob(text,
-		// Success callback
-		function(id, output, meta) {
-			
-			// CASE: No Output:
-			if (output == null) {
-				
-				// Begin polling for the job to complete.
-				pollForOutput(id);
-				
-			}
-			
-			// CASE: We have output!
-			else {
-				// Make a new output text object with the job's contents.
-				makeNewOutputTO(output, 'Output');
-				
-				// Restore button
-				$('#run-button').removeAttr('disabled').find('i').addClass('icon-play').removeClass('icon-spinner').removeClass('icon-spin');
-			}
+			$('#outputColumn').css({
+				'width' : 'calc(100% - '+ parseInt(ui.position.left + 10) +'px)',
+				'margin-left' : parseInt(ui.position.left + 10) +'px)',
+			});
 		},
-		
-		// Error callback
-		function(errMsg, data) {
-			
-			alert(errMsg);
-			console.log(data);
-			// Restore button
-			$('#run-button').removeAttr('disabled').find('i').addClass('icon-play').removeClass('icon-spinner').removeClass('icon-spin');
-		
-		}); //end jclProcessor.sendJob
-		
-}; //end submitJob(..)
-
-var newOutput = function(output){
-	$('#outputStorage').append('<li id="output-' + OUTPUT_COUNT + '>' + output + '<li>');
-	$('#outputTabs').append('<li id="outputTab-' + OUTPUT_COUNT + ' data-id="' + OUTPUT_COUNT + '">Output ' + OUTPUT_COUNT + '<li>');
-	OUTPUT_COUNT++;
-	output.setValue($('#output-' + OUTPUT_COUNT).text());
-	$('#outputTabs > li.selected').removeClass('selected');
-	$('#output-' + OUTPUT_COUNT).addClass('selected')
-}
-
-
-/**
- * makeNewOutputTO
- * 
- * Make new output text object.
- * 
- * @param string content
- * 	The textual content to place in the text object.
- * @param string name
- * 	The name of the tab
- */
-var makeNewOutputTO = function(content, name) {
-	
-	var index = outputPTO.createTextObject(name);
-	var o = outputPTO.getByIndex(index);
-	o.editor.setValue(content);
-	
-	// make it read only
-	o.editor.setReadOnly(true);
-	
-}
-
-/**
- * pollForOutput
- * 
- * Given a job ID, this will wait for a period of time and attempt to retrieve
- * the job.  If the output is null, then it will wait for a period of time and
- * try again.
- * 
- * Upon success it makes a new output pane with the content.
- * 
- * Errors are alerted and logged.
- * 
- * This function is intended to be used when the job processor returns no output
- * but the job has been assigned an ID. (Usually this is when the job is taking
- * too long to process and one should check back later.)
- * 
- * @param job_id id
- * 	The id of the job to retrieve.
- * 
- */
-var pollForOutput = function(id) {
-	
-	console.log("Did not receive job immediately.. will poll again soon...");
-	
-	// How many ms should we wait before trying to get the job?
-	var timeout = 5000;
-	
-	// Invoke this function in X ms from now.
-	setTimeout(function() {
-		
-		// Try to get the job.
-		jclProcessor.retrieveJob(id, 
-			
-			// Success case
-			function(output, sub, meta)
-			{
-				
-				if(output == null)
-					// Try again later if still no output.
-					pollForOutput(id);
-				
-				
-				else
-					// Show the output!
-					makeNewOutputTO(output, "Output");
-				
-				// Restore button
-				$('#run-button').removeAttr('disabled').find('i').addClass('icon-play').removeClass('icon-spinner').removeClass('icon-spin');
-				
-			},
-			
-			// Error case
-			function(errMsg, data)
-			{
-				alert(errMsg);
-				console.log(data);
-				
-			});
-		
-	}, timeout);
-	
-}
-
-/**
- * getTextDownloadURL
- * 
- * Given a string of text, this will produce a local URL to where the text can
- * be downloaded.
- * 
- * @param string text
- * 	The text to be made available by local URL.
- * 
- */
-var getTextDownloadURL = function(text){
-	
-	// Split text into a character array.
-	text = text.split('');
-	
-	// Create the blob of the code.
-	var blob = new Blob(text, {type: "application/octet-stream"});
-	
-	// Obtian URL to the blob.
-	var fileURL = window.URL.createObjectURL(blob);
-	
-	return fileURL;
-	
-}
-
-/**
- * downloadActiveTO
- * 
- * This will present a download prompt to download the contents of the 
- * currently active TO from the specified TO manager.  It currently doesn't
- * do anything if there is no active TO.
- * 
- * @param TextObjectManager manager
- * 	Instance of a TextObjectManager
- * 
- */
-var downloadActiveTO = function(manager) {
-	
-	var textObject = manager.getActive()
-	
-	// Quit if there is no active text object.
-	if(!textObject)
-		return false;
-	
-	// Obtain the text of the output.
-	var text = textObject.editor.getValue();
-	
-	/* linefeed / line ending fix
-	 * downloaded output does not look formatted correctly on windows. */
-	if (window.navigator.platform.match('Win32'))
-	{
-		// Feed a new string characters from the old string
-		var windowstext = "";
-		for (k in text) 
-		{
-			// If we come across a LF
-			if (text[k] == '\n')
-			{
-				// Feed the new string a CR before the LF.
-				windowstext += '\r';
-				windowstext += '\n';
-			}
-			
-			else
-				windowstext += text[k];
-			
-		}
-		
-		// Replace the old string with the new one.
-		text = windowstext;
-	}
-	
-	
-	// Navigate browser to the URL of the text.
-	window.location = getTextDownloadURL(text);
-	
-}
+	});
+});

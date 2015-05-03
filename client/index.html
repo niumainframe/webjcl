@@ -1,124 +1,90 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html>
+
+<!DOCTYPE html>
+<html lang="en" ng-app="webJCL">
 <head>
-<title>Web JCL</title>
-<link rel="stylesheet" type="text/css" href="css/reset.css">
-<link rel="stylesheet" type="text/css" href="css/main.css">
-<link rel="stylesheet" type="text/css" href="css/ace.css">
-<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="css/jquery-ui-1.10.1.custom.css">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<link rel="icon" href="../../favicon.ico">
+
+	<title>WebJCL</title>
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	<link href='http://fonts.googleapis.com/css?family=Exo+2:400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" type="text/css" href="bower_components/codemirror/lib/codemirror.css">
+
+	<link href="css/main.css" rel="stylesheet">
 </head>
-<body>
-	<div id="header">
-		<ul id="menu">
-			<li>
-				<button id="ide" disabled autocomplete="off"><i class="icon-wrench"></i> IDE</button>
-			</li>
-			<li>
-				<button id="account" class="selected" autocomplete="off"><i class="icon-key"></i> Account</button>
-			</li>
-			<li>
-				<button id="feedback" autocomplete="off"><i class="icon-bullhorn"></i> Feedback</button>
-			</li>
-			<li>
-				<button id="feedback" autocomplete="off" onClick="window.location='alpha.html'"><i class="icon-beaker"></i> Old Version</button>
-			</li>
-		</ul>
-	</div>
-	<div id="account-page" class="page">
-		<form id="accountForm">
-			<ul>
-				<li>
-					<h1>Account</h1>
-				</li>
-				<li>
-					<label>Marist Account</label>
-					<input id="username" autocomplete="off" type="text"/>
-				</li>			
-				<li>
-					<label>Password</label>
-					<input id="password" autocomplete="off" type="password"/>
-				</li>				
-				<li>
-					<button id="saveAccount" autocomplete="off">Save</button>
-					<button id="changeAccount" autocomplete="off" disabled>Change</button>
-				</li>
-			</ul>
-			
-			<div style="width:250px;margin:0 auto; margin-top:50px;">
-				<a class="twitter-timeline" href="https://twitter.com/webjcl" data-widget-id="328360966171533312">Tweets by @webjcl</a>
-				<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-			</div>
-			
-		</form>
-	</div>
-	<div id="feedback-page" class="page">
-		<iframe id="feedbackFrame" src="https://docs.google.com/forms/d/1BjYUvh-jaiwl62cTl_t2A8OMScvC41e-0biFJ2WkhT4/viewform"></iframe>
-	</div>
-	<div id="ide-page" class="page">
-		<div id="toolbar">
-			<ul>
-				<li><button autocomplete="off" id="new-button"><i class="icon-file"></i> New</button></li>
-				<li><button autocomplete="off" id="save-code-button"><i class="icon-save"></i>Save Code</button></li>
-				<li><button autocomplete="off" id="save-output-button"><i class="icon-save"></i>Save Output</button></li>
-				<li><button autocomplete="off" id="run-button"><i class="icon-play"></i> Run</button></li>
-			</ul>
-		</div>
-		<div id="contentSpace">
-			<div id="leftWindow" class="window ui-layout-west">
-				<div class="panel"></div>
-			</div>
-			<div id="centerWindow" class="window ui-layout-center">
-				<div class="panel" id="codePanel">
-					<div class="panelBox codeBox" id="code">
-						<div class="header">
-							<h1>Code</h1>
-						</div>
-						<div class="body">
-							<div class="tabsContainer">
-								<ul class="tabs" id="codeTab">
-									<!--<li class="selected"><a>Tab</a></li>-->
-								</ul>
-							</div>
-							<div class="content">
-								<ul class="textSpace">
-								
-								</ul>
-                                <div id="colCounter" class="colCounter">asdf</div>
-							</div>
-						</div>
-					</div>
+
+	<body ng-controller="MainController">
+
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="#">Web<strong>JCL</strong></a>
+				</div>
+				<div id="navbar" class="navbar-right navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<li><a href="#">About</a></li>
+						<li><a href="#">Feedback</a></li>
+						<li><a href="#">Settings</a></li>
+					</ul>
 				</div>
 			</div>
-			<div id="rightWindow" class="window ui-layout-east">
-				<div class="panel" id="outputPanel">
-					<div class="panelBox codeBox" id="code">
-						<div class="header">
-							<h1>Output</h1>
-						</div>
-						<div class="body">
-							<div class="tabsContainer">
-								<ul class="tabs" id="outputTab">
-								</ul>
-							</div>
-							<div class="content">
-								<ul class="textSpace">
-								
-								</ul>
-							</div>
-						</div>
+		</nav>
+
+		<div id="container-content">
+			<div id="inputColumn">
+				<div class="row toolbar">
+					<div class="col-md-4">
+						<h2>Input</h2>
+					</div>
+					<div class="col-md-8 text-right"><!--
+						<a href="#" class="btn btn-sm btn-link" ng-click="generateUniqueLink()" ng-disabled="!input" data-toggle="popover" data-placement="bottom" data-html="true" title="Unique Link" data-animation="false" data-content="<input type='text' id='uniqueLink' value='{{uniqueLink}}' readonly />">Save/Share</a> -->
+						<a href="#" class="btn btn-sm btn-link" ng-disabled="!input" ng-click="downloadInput()">Download</a> 
+						<a href="#" class="btn btn-sm btn-default" ng-disabled="!input" ng-click="run()">Run</a>
 					</div>
 				</div>
+				<ui-codemirror ng-model="input" ui-codemirror-opts="codemirrorOptions" id="editor"></ui-codemirror>
+			</div>
+			<div id="resizer-container"></div>
+			<div id="resizer"></div>
+			<div id="outputColumn">
+				<div class="row toolbar">
+					<div class="col-md-4">
+						<h2>Output</h2>
+					</div>
+					<div class="col-md-8 text-right">
+						<a href="#" class="btn btn-sm btn-default" ng-disabled="!output" ng-click="downloadOutput()">Download</a>
+					</div>
+				</div>
+				<div id="output" ng-bind="output"></div>
 			</div>
 		</div>
-	</div>
-	<script src="js/ace/ace.js" charset="utf-8"></script>
-	<script src="js/jquery-1.9.1.js"></script>
-	<script src="js/jquery-ui-1.10.1.custom.js"></script>
-	<script src="js/jquery.layout.min.js"></script>
-	<script src="js/jquery.mousewheel.min.js"></script>
-	<script src="js/JCLProcessor.js"></script>
-	<script src="js/main.js"></script>
-	<script src="js/textobject.js"></script>
-</body>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="bower_components/codemirror/lib/codemirror.js"></script>
+		<script src="bower_components/codemirror/addon/mode/simple.js"></script>
+		<script src="bower_components/angular/angular.js"></script>
+		<script src="bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
+		<script src="js/codemirror-mode-bal.js"></script> 
+		<script src="js/JCLProcessor.js"></script>
+		<script src="js/TextDownloader.js"></script>
+		<script src="js/main.js"></script>
+	</body>
 </html>

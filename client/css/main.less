@@ -1,0 +1,115 @@
+// load the main bootstrap file
+@import "../bower_components/bootstrap/less/bootstrap.less";
+
+@navbar-inverse-link-color: lighten(@gray-light, 40%);
+@container-large-desktop: 100%;
+@container-border-color: #bbb;
+
+body {
+	font-family: 'Exo 2', sans-serif;
+	padding-top: 51px; /* because of navbar */
+}
+
+.navbar-inverse {
+	background-color:#01579B;
+}
+
+.navbar-inverse .navbar-brand {
+	color: @navbar-inverse-link-color;
+}
+
+.navbar-inverse .navbar-nav {
+	> li > a {
+		color: @navbar-inverse-link-color;
+
+		&:hover,
+		&:focus {
+			color: #fff;
+			background-color: inherit;
+		}
+	}
+}
+
+.container-no-padding {
+	padding:0;
+}
+
+#container-content {
+	position: absolute;
+	top: 51px;
+	left:0;
+	right:0;
+	bottom: 0;
+}
+
+#inputColumn, #outputColumn {
+	width:calc(~'50% - 5px');
+	position:absolute;
+	top:0;
+	bottom:0;
+	z-index:1;
+	overflow:auto;
+}
+
+#inputColumn {
+	left:0;
+}
+
+#editor, #output {
+	position: absolute;
+	top: 47px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+#outputColumn {
+	right:0;
+	margin-left:10px;
+}
+
+#output {
+	white-space: pre;
+	overflow: auto;
+	position: absolute;
+	font-family: monospace;
+}
+
+#resizer {
+	background:#eaeaea;
+	border-left:1px solid @container-border-color;
+	border-right:1px solid @container-border-color;
+	position:absolute;
+	width:10px;
+	left:calc(~'50% - 5px');
+	height:100%;
+	cursor:col-resize;
+	z-index:2;
+}
+
+#resizer-container {
+	position:absolute;
+	top:0;
+	bottom:0;
+	left:20%;
+	right:20%;
+}
+
+.toolbar {
+	background:#eaeaea;
+	padding:8px 0;
+	border-bottom:1px solid @container-border-color;
+	margin:0;
+}
+
+.toolbar h2 {
+	font-size:1.2em;
+	margin: 6px 0;
+}
+
+
+/* CodeMirror */
+
+.CodeMirror {
+	height:100% !important;
+}
