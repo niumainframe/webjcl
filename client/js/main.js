@@ -29,10 +29,11 @@
 		$scope.run = function() {
 			var willRunJob = true; // Tweaks submit button text during login
 			Authenticator.getCredentials(willRunJob).then(function (credentials) {
-
+				$scope.runningJob = true;
 				JCLProcessor
 					.processJCL($scope.input,credentials.loginID,credentials.password)
 					.then(function(output){
+						$scope.runningJob = false;
 						$scope.output = output;
 					});
 			}, function(error) {
@@ -47,9 +48,11 @@
 			var willRunJob = true; // Tweaks submit button text during login
 
 			Authenticator.getCredentials(willRunJob).then(function (credentials) {
+				$scope.runningJob = true;
 				JCLProcessor
 					.processJCL($scope.input,credentials.loginID,credentials.password)
 					.then(function(output){
+						$scope.runningJob = false;
 						$scope.output = output;
 					});
 			}, function(error) {

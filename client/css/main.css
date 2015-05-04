@@ -6604,7 +6604,7 @@ body {
   white-space: pre;
   overflow: auto;
   position: absolute;
-  font-family: monospace;
+  font-family: 'Source Code Pro', 'monospace';
 }
 #resizer {
   background: #eaeaea;
@@ -6634,21 +6634,16 @@ body {
   font-size: 1.2em;
   margin: 6px 0;
 }
-.btn-group .dropdown-toggle {
-  padding-left: 8px;
-  padding-right: 8px;
-  margin-left: -1px;
-}
-.tooltip-width-md {
-  width: 200px;
-}
+/* Bootstrap tweaks */
 .modal-header .close {
   margin-top: 5px;
 }
 .tooltip-inner small {
+  /* keyboard shortcuts */
   color: #ffe45d;
 }
 /* CodeMirror */
 .CodeMirror {
   height: 100% !important;
+  font-family: 'Source Code Pro', 'monospace';
 }

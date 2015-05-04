@@ -17,6 +17,7 @@
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
 	<link href='//fonts.googleapis.com/css?family=Exo+2:400,700' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,700' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css">
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="bower_components/codemirror/lib/codemirror.css">
@@ -69,14 +70,21 @@
 							<button
 								type="button"
 								class="btn btn-sm btn-default"
-								ng-disabled="!input"
+								ng-disabled="!input || runningJob"
 								ng-click="run()"
 								tooltip-html-unsafe="Run job{{(!hasLoggedIn() ? ' (login required)' : '')}}<br/><small>Ctrl + Enter</small>"
 								tooltip-placement="bottom"
 								tooltip-popup-delay="500"
 								tooltip-append-to-body="true"
-							>Run<span ng-show="!hasLoggedIn()">&hellip;</span></button>
-							<button type="button" ng-show="hasLoggedIn()" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" tooltip="Run options" tooltip-placement="bottom" tooltip-popup-delay="500" tooltip-append-to-body="true">
+							>
+								<span ng-show="!runningJob">
+									Run<span ng-show="!hasLoggedIn()">&hellip;</span>
+								</span>
+								<span ng-show="runningJob">
+									<i class="fa fa-spinner fa-pulse fa-fw"></i> Running&hellip;
+								</span>
+							</button>
+							<button type="button" ng-show="hasLoggedIn()" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" tooltip="Run options" tooltip-placement="bottom" tooltip-popup-delay="500" tooltip-append-to-body="true" ng-disabled="runningJob">
 								<span class="caret"></span>
 								<span class="sr-only">Toggle Dropdown</span>
 							</button>
