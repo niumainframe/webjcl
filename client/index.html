@@ -39,8 +39,8 @@
 				<div id="navbar" class="navbar-right navbar-collapse collapse">
 					<ul class="nav navbar-nav">
 						<li><a href="#">About</a></li>
-						<li><a href="#">Feedback</a></li>
-						<li><a href="#">Settings</a></li>
+						<li><a href="#">Feedback</a></li><!--
+						<li><a href="#">Settings</a></li>-->
 					</ul>
 				</div>
 			</div>
@@ -52,10 +52,21 @@
 					<div class="col-md-4">
 						<h2>Input</h2>
 					</div>
-					<div class="col-md-8 text-right"><!--
-						<a href="#" class="btn btn-sm btn-link" ng-click="generateUniqueLink()" ng-disabled="!input" data-toggle="popover" data-placement="bottom" data-html="true" title="Unique Link" data-animation="false" data-content="<input type='text' id='uniqueLink' value='{{uniqueLink}}' readonly />">Save/Share</a> -->
-						<a href="#" class="btn btn-sm btn-link" ng-disabled="!input" ng-click="downloadInput()">Download</a> 
-						<a href="#" class="btn btn-sm btn-default" ng-disabled="!input" ng-click="run()">Run</a>
+					<div class="col-md-8 text-right">
+						<a href="#" class="btn btn-sm btn-link" ng-click="generateUniqueLink()" ng-disabled="!input" data-toggle="popover" data-placement="bottom" data-html="true" title="Unique Link" data-animation="false" data-content="<input type='text' id='uniqueLink' value='{{uniqueLink}}' readonly />">Save/Share</a>
+						<a href="#" class="btn btn-sm btn-link" ng-disabled="!input" ng-click="downloadInput()" title="Download code to text file">Download</a>
+						<span ng-class="{'btn-group': shouldShowRunOptions()}">
+							<button type="button" class="btn btn-sm btn-default" ng-disabled="!input" ng-click="run()" ng-attr-title="Run job{{(getCurrentLoginID() ? ' as '+getCurrentLoginID() : '')}}">Run</button>
+							<button type="button" ng-show="shouldShowRunOptions()" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" title="Run options">
+								<span class="caret"></span>
+								<span class="sr-only">Toggle Dropdown</span>
+							</button>
+							<ul class="dropdown-menu dropdown-menu-right" role="menu" ng-show="shouldShowRunOptions()">
+								<li role="presentation" class="dropdown-header">Running as <strong>{{getCurrentLoginID()}}</strong></li>
+								<li><a href="#" ng-click="changeLoginAndRun()" title="Change the login ID used to run jobs">Change...</a></li>
+								<li><a href="#" ng-click="clearLogin()" title="Clear the login ID used to run jobs">Clear login</a></li>
+							</ul>
+						</span>
 					</div>
 				</div>
 				<ui-codemirror ng-model="input" ui-codemirror-opts="codemirrorOptions" id="editor"></ui-codemirror>
@@ -82,9 +93,13 @@
 		<script src="bower_components/codemirror/addon/mode/simple.js"></script>
 		<script src="bower_components/angular/angular.js"></script>
 		<script src="bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
+		<script src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+		<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 		<script src="js/codemirror-mode-bal.js"></script> 
 		<script src="js/JCLProcessor.js"></script>
 		<script src="js/TextDownloader.js"></script>
+		<script src="js/Authenticator.js"></script>
+		<script src="js/AuthenticationModalController.js"></script>
 		<script src="js/main.js"></script>
 	</body>
 </html>
