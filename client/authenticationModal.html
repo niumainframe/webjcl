@@ -1,17 +1,26 @@
 <div class="modal-header">
-    <h3 class="modal-title">Log In to Marist</h3>
+	<button type="button" class="close" aria-label="Close" ng-click="cancel()"><span aria-hidden="true"><i class="fa fa-times"></i></span></button>
+	<h3 class="modal-title">Log In to Marist</h3>
 </div>
-<div class="modal-body">
-	<div class="form-group">
-		<label for="loginID">Marist ID</label>
-		<input type="text" class="form-control" ng-model="loginID" id="loginID" placeholder="Marist ID" autofocus required />
+<form>
+	<div class="modal-body">
+		<p>You must log in to your Marist account in order to run jobs.<!-- <a href="#">Having trouble with your account?</a>--></p>
+		<div class="form-group">
+			<label for="loginID">Marist ID</label>
+			<input tabindex="1" type="text" class="form-control" ng-model="loginID" id="loginID" placeholder="Marist ID" autofocus required />
+		</div>
+		<div class="form-group">
+			<label for="password">Password</label>
+			<input tabindex="2" type="password" class="form-control" ng-model="password" id="password" placeholder="Password" required />
+		</div>
+		<div class="checkbox">
+			<label>
+				<input type="checkbox" ng-model="remember" tabindex="3"> Remember me 
+			</label>
+		</div>
 	</div>
-	<div class="form-group">
-		<label for="password">Password</label>
-		<input type="password" class="form-control" ng-model="password" id="password" placeholder="Password" required />
+	<div class="modal-footer">
+		<button class="btn btn-default" ng-click="cancel()" tabindex="5">Cancel</button>
+		<button class="btn btn-primary" ng-click="ok()" ng-disabled="!loginID || !password" tabindex="4">Log In<span ng-show="willRunJob"> and Run Job</span></button>
 	</div>
-</div>
-<div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-primary" ng-click="ok()" ng-disabled="!loginID || !password">Log In</button>
-</div>
+</form>

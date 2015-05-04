@@ -16,8 +16,9 @@
 		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
-	<link href='http://fonts.googleapis.com/css?family=Exo+2:400,700' rel='stylesheet' type='text/css'>
+	<link href='//fonts.googleapis.com/css?family=Exo+2:400,700' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="bower_components/codemirror/lib/codemirror.css">
 
 	<link href="css/main.css" rel="stylesheet">
@@ -54,16 +55,34 @@
 					</div>
 					<div class="col-md-8 text-right">
 						<a href="#" class="btn btn-sm btn-link" ng-click="generateUniqueLink()" ng-disabled="!input" data-toggle="popover" data-placement="bottom" data-html="true" title="Unique Link" data-animation="false" data-content="<input type='text' id='uniqueLink' value='{{uniqueLink}}' readonly />">Save/Share</a>
-						<a href="#" class="btn btn-sm btn-link" ng-disabled="!input" ng-click="downloadInput()" title="Download code to text file">Download</a>
-						<span ng-class="{'btn-group': shouldShowRunOptions()}">
-							<button type="button" class="btn btn-sm btn-default" ng-disabled="!input" ng-click="run()" ng-attr-title="Run job{{(getCurrentLoginID() ? ' as '+getCurrentLoginID() : '')}}">Run</button>
-							<button type="button" ng-show="shouldShowRunOptions()" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" title="Run options">
+						<a
+							href="#"
+							class="btn btn-sm btn-link"
+							ng-disabled="!input"
+							ng-click="downloadInput()" 
+							tooltip="Download code to text file"
+							tooltip-placement="bottom"
+							tooltip-popup-delay="500"
+							tooltip-append-to-body="true"
+						>Download</a>
+						<span ng-class="{'btn-group': hasLoggedIn()}">
+							<button
+								type="button"
+								class="btn btn-sm btn-default"
+								ng-disabled="!input"
+								ng-click="run()"
+								tooltip-html-unsafe="Run job{{(!hasLoggedIn() ? ' (login required)' : '')}}<br/><small>Ctrl + Enter</small>"
+								tooltip-placement="bottom"
+								tooltip-popup-delay="500"
+								tooltip-append-to-body="true"
+							>Run<span ng-show="!hasLoggedIn()">&hellip;</span></button>
+							<button type="button" ng-show="hasLoggedIn()" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" tooltip="Run options" tooltip-placement="bottom" tooltip-popup-delay="500" tooltip-append-to-body="true">
 								<span class="caret"></span>
 								<span class="sr-only">Toggle Dropdown</span>
 							</button>
-							<ul class="dropdown-menu dropdown-menu-right" role="menu" ng-show="shouldShowRunOptions()">
+							<ul class="dropdown-menu dropdown-menu-right" role="menu" ng-show="hasLoggedIn()">
 								<li role="presentation" class="dropdown-header">Running as <strong>{{getCurrentLoginID()}}</strong></li>
-								<li><a href="#" ng-click="changeLoginAndRun()" title="Change the login ID used to run jobs">Change...</a></li>
+								<li><a href="#" ng-click="changeLoginAndRun()" title="Change the login ID used to run jobs">Change&hellip;</a></li>
 								<li><a href="#" ng-click="clearLogin()" title="Clear the login ID used to run jobs">Clear login</a></li>
 							</ul>
 						</span>
@@ -95,6 +114,7 @@
 		<script src="bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
 		<script src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
 		<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+		<script src="bower_components/angular-local-storage/dist/angular-local-storage.min.js"></script>
 		<script src="js/codemirror-mode-bal.js"></script> 
 		<script src="js/JCLProcessor.js"></script>
 		<script src="js/TextDownloader.js"></script>

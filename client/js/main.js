@@ -19,8 +19,16 @@
 			},
 		};
 
+		$(document).on('keypress', function(e) {
+			if (e.keyCode === 13 && e.ctrlKey) {
+				// CTRL + Enter
+				$scope.run();
+			}
+		});
+
 		$scope.run = function() {
-			Authenticator.getCredentials().then(function (credentials) {
+			var willRunJob = true; // Tweaks submit button text during login
+			Authenticator.getCredentials(willRunJob).then(function (credentials) {
 
 				JCLProcessor
 					.processJCL($scope.input,credentials.loginID,credentials.password)
@@ -36,7 +44,9 @@
 		$scope.changeLoginAndRun = function() {
 			var oldPassword = Authenticator.getPassword();
 			Authenticator.setPassword(null);
-			Authenticator.getCredentials().then(function (credentials) {
+			var willRunJob = true; // Tweaks submit button text during login
+
+			Authenticator.getCredentials(willRunJob).then(function (credentials) {
 				JCLProcessor
 					.processJCL($scope.input,credentials.loginID,credentials.password)
 					.then(function(output){
@@ -49,6 +59,7 @@
 		};
 
 		$scope.clearLogin = function() {
+			Authenticator.setRememberSetting(false);
 			Authenticator.clearCredentials();
 		};
 
@@ -73,7 +84,7 @@
 			TextDownloader.startDownloadWithText($scope.output, 'webjcl-job-');
 		};
 
-		$scope.shouldShowRunOptions = function() {
+		$scope.hasLoggedIn = function() {
 			return Boolean($scope.getCurrentLoginID());
 		};
 
