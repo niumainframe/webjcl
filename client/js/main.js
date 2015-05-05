@@ -1,9 +1,11 @@
 (function() {
 	angular.module('webJCL',[
 	  'ui.codemirror',
+	  'btford.markdown',
 	  'webJCL.JCLProcessor',
 	  'webJCL.TextDownloader',
 	  'webJCL.Authenticator',
+	  'webJCL.CodeReference',
 	])
 	.controller('MainController', MainController);
 
@@ -33,6 +35,7 @@
 				JCLProcessor
 					.processJCL($scope.input,credentials.loginID,credentials.password)
 					.then(function(output){
+						$('.tooltip').hide();
 						$scope.runningJob = false;
 						$scope.output = output;
 					});
@@ -89,6 +92,26 @@
 
 		$scope.hasLoggedIn = function() {
 			return Boolean($scope.getCurrentLoginID());
+		};
+
+
+		// TODO: put reference into its own directive
+		//$scope.reference = CodeReferenceService.getReference();
+		$scope.showReference = function() {
+			$scope.referenceExpanded = true;
+			
+			// TODO remove jquery dependencies
+			function resizeReference() {
+				$('#output').css({'bottom':$('#reference').height()+40+'px'});
+			}
+			window.addEventListener('resize', resizeReference);
+			setTimeout(resizeReference,0);
+		};
+
+		$scope.showReference();
+		$scope.hideReference = function() {
+			$scope.referenceExpanded = false;
+			$('#output').css({'bottom':0});
 		};
 
 		$scope.input = "\

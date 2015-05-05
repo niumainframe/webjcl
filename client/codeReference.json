@@ -1,0 +1,192 @@
+[
+	{
+		"name": "Storage",
+		"items": [
+			{
+				"name": "Define empty storage",
+				"format": "*`label`*  `DS  rSLn`",
+				"description": [
+					"####`r` &mdash; Repetition factor (optional)\n\n",
+					"* Decimal number describing number of `n`-length storage classes to repeat\n\n",
+					"* Default: `1`\n\n",
+					"####`Ln` &mdash; Length (optional)\n\n",
+					"* `n` is the number of bytes of the storage area. Optional decimal number\n\n",
+					"* `L` must be coded if `n` is going to be specified.\n\n",
+					"* Default: depends on storage class\n\n",
+					"####`S` &mdash; Storage class\n\n",
+					"* Type of data that will be stored\n\n",
+					"* Two types\n\n",
+					"  1. `F` &mdash; fullword data\n\n",
+					"     * numbers to do arithmetic with\n\n",
+					"     * default length: 4 bytes\n\n",
+					"     * data type: 32-bit twos complement integer\n\n",
+					"     * alignment: fullword boundary; absolute address divisble by 4\n\n",
+					"  2. `C` &mdash; character data\n\n",
+					"     * default length: 1 byte\n\n",
+					"     * data type: EBCDIC characters (1 character/byte)\n\n",
+					"     * alignment: none\n\n"
+				],
+				"example": [
+					"    NUM1  DS  F    ==>  1 fullword  ==> 4 bytes\n",
+					"    NUM2  DS  5F   ==>  5 fullwords  ==> 20 bytes\n",
+					"    NUM3  DS  FL3  ==>  3 bytes\n",
+					"    NUM4  DS  4FL2 ==>  8 bytes\n\n",
+					"    TEXT1  DS  CL4   ==>  4 bytes\n",
+					"    TEXT2  DS  10CL6 ==>  60 bytes\n",
+					"    TEXT3  DS  10C   ==>  10 bytes"
+				]
+			},
+			{
+				"name": "Define a constant",
+				"format": "*`label`*  `DC  rSLn'value'`",
+				"description": [
+					"####`r` &mdash; Repetition factor\n\n",
+					"####`S` &mdash; Storage class\n\n",
+					"####`Ln` &mdash; Length\n\n",
+					"####`value` &mdash; constant (or initial) value. Enclosed in single quotes.\n\n",
+					"* NOTE: A `value` may be specified on a `DS` statement, but it will be ignored."
+				],
+				"example": [
+					"    NUM1   DC  F'27'        0000001B\n",
+					"    NUM2   DC  F'-1'        FFFFFFFF\n",
+					"    NUM3   DC  F'2,-1,18'   00000002FFFFFFFF00000012\n",
+					"    NUM4   DC  3F'1'        000000010000000100000001\n",
+					"    TEXT1  DC  C'HELLO'     C8C5D3D3D6\n",
+					"    TEXT2  DC  CL8'HELLO'   C8C5D3D3D6404040\n",
+					"    TEXT3  DC  CL3'HELLO'   C8C5D3\n",
+					"    TEXT4  DS  CL4'BYE'     F5F5F5F5  <- empty storage"
+				]
+			}
+		]
+	},
+
+	{
+		"name": "RX Instructions",
+		"items": [
+			{
+				"name": "Load",
+				"format": "*`label`* `L R,D(X,B)`",
+				"description": [
+					"Copies the 4 bytes at the absolute address represented ",
+					"by `D(X,B)` into `R`. The previous contents of `R` are overwritten."
+				],
+				"example": [
+					"    L    2,0(,2)\n",
+					"    L    3,TEST1\n",
+					"    L    5,=F'10'"
+				]
+			},
+			{
+				"name": "Store",
+				"format": "*`label`* `ST R,D(X,B)`",
+				"description": [
+					"Stores the contents of R at the absolute address represented by `D(X,B)`."
+				],
+				"example": [
+					"    ST   1,TEST2\n",
+					"    ST   2,0(,3)"
+				]
+			},
+			{
+				"name": "Add",
+				"format": "*`label`* `A R,D(X,B)`",
+				"description": [
+					"Takes the 4 bytes from the absolute address represented by `D(X,B)` and adds ",
+					"it to the contents of `R`. The result is stored in `R`.\n\n",
+					"Sets the Condition Code:\n\n",
+					"* `0`: Result is equal to 0\n",
+					"* `1`: Result is less than 0\n",
+					"* `2`: Result is greater than 0\n",
+					"* `3`: Overflow"
+				],
+				"example": [
+					"    A    6,=F'1'\n",
+					"    A    11,106(0,10)\n",
+					"    A    2,LABEL1"
+				]
+			},
+			{
+				"name": "Subtract",
+				"format": "*`label`* `S R,D(X,B)`",
+				"description": [
+					"Takes the 4 bytes from the absolute address represented by `D(X,B)` and subtracts ",
+					"it from the contents of `R`. The result is stored in `R`.\n\n",
+					"Sets the Condition Code:\n\n",
+					"* `0`: Result is equal to 0\n",
+					"* `1`: Result is less than 0\n",
+					"* `2`: Result is greater than 0\n",
+					"* `3`: Overflow"
+				],
+				"example": [
+					"    S    6,=F'1'\n",
+					"    S    11,106(0,10)\n",
+					"    S    2,LABEL1"
+				]
+			},
+			{
+				"name": "Multiply",
+				"format": "*`label`* `M R,D(X,B)`",
+				"description": [
+					"* `R` is an even-numbered register representing an even-odd pair of registers. The ",
+					"number to multiply must be in the odd numbered register.\n\n",
+					"* `D(X,B)` is the address of a fullword number to multiply by."
+				],
+				"example": [
+					"    M  4,TWO    where  TWO  DC  F'2'\n",
+					"    BEFORE:    R4 = 05002037    R5 = FFFFFFFD  (-3 in decimal)\n",
+					"    AFTER:     R4 = FFFFFFFF    R5 = FFFFFFFA\n",
+					"                64 bit representation of -6 "
+				]
+			}
+		]
+	},
+
+	{
+		"name": "RR Instructions",
+		"items": [
+			{
+				"name": "Load Register",
+				"format": "*`label`* `LR R`<sub>`1`</sub>`R`<sub>`2`</sub>",
+				"description": [
+					"Copies the contents of `R`<sub>`2`</sub> into `R`<sub>`1`</sub>. The previous ",
+					"contents of `R`<sub>`1`</sub> are overwritten."
+				],
+				"example": [
+					"    LR   7,4         LOAD CONTENTS OF REGISTER 4 INTO REGISTER 7"
+				]
+			},
+			{
+				"name": "Add Register",
+				"format": "*`label`* `AR R`<sub>`1`</sub>`R`<sub>`2`</sub>",
+				"description": [
+					"Adds the contents of `R`<sub>`2`</sub> to `R`<sub>`1`</sub>. Result is placed ",
+					"in `R`<sub>`1`</sub>.\n\n",
+					"Sets the Condition Code:\n\n",
+					"* `0`: Result is equal to 0\n",
+					"* `1`: Result is less than 0\n",
+					"* `2`: Result is greater than 0\n",
+					"* `3`: Overflow"
+				],
+				"example": [
+					"    AR   7,4         ADD CONTENTS OF REGISTER 4 TO REGISTER 3"
+				]
+			},
+			{
+				"name": "Subtract Register",
+				"format": "*`label`* `SR R`<sub>`1`</sub>`R`<sub>`2`</sub>",
+				"description": [
+					"Subtracts the contents of `R`<sub>`2`</sub> from `R`<sub>`1`</sub>. Result is placed ",
+					"in `R`<sub>`1`</sub>.\n\n",
+					"Sets the Condition Code:\n\n",
+					"* `0`: Result is equal to 0\n",
+					"* `1`: Result is less than 0\n",
+					"* `2`: Result is greater than 0\n",
+					"* `3`: Overflow"
+				],
+				"example":
+					"    AR   7,4         SUBTRACT CONTENTS OF R4 FROM R3"
+			}
+		]
+	}
+
+]

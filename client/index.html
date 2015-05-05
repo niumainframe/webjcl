@@ -72,7 +72,7 @@
 								class="btn btn-sm btn-default"
 								ng-disabled="!input || runningJob"
 								ng-click="run()"
-								tooltip-html-unsafe="Run job{{(!hasLoggedIn() ? ' (login required)' : '')}}<br/><small>Ctrl + Enter</small>"
+								tooltip-html-unsafe="Run job{{(!hasLoggedIn() ? ' (login required)' : '')}}<br/><small>Ctrl + Enter</small>"								tooltip-enable="!runningJob"
 								tooltip-placement="bottom"
 								tooltip-popup-delay="500"
 								tooltip-append-to-body="true"
@@ -110,6 +110,18 @@
 					</div>
 				</div>
 				<div id="output" ng-bind="output"></div>
+				<div id="reference" ng-class="{'expanded' : referenceExpanded}">
+					<button class="btn btn-primary" ng-click="showReference()" ng-show="!referenceExpanded"><i class="fa fa-book fa-fw"></i>Reference</button>
+					<div ng-show="referenceExpanded">
+						<button class="btn btn-link pull-right close"><i class="fa fa-times fa-fw" ng-click="hideReference()"></i></button>
+						<code-reference></code-reference>
+						
+
+
+
+
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -123,11 +135,16 @@
 		<script src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
 		<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 		<script src="bower_components/angular-local-storage/dist/angular-local-storage.min.js"></script>
+		<script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+		<script src="bower_components/showdown/compressed/Showdown.min.js"></script>
+		<script src="bower_components/angular-markdown-directive/markdown.js"></script>
 		<script src="js/codemirror-mode-bal.js"></script> 
 		<script src="js/JCLProcessor.js"></script>
 		<script src="js/TextDownloader.js"></script>
 		<script src="js/Authenticator.js"></script>
 		<script src="js/AuthenticationModalController.js"></script>
+		<script src="js/CodeReference.js"></script>
+		<script src="js/CodeReferenceService.js"></script>
 		<script src="js/main.js"></script>
 	</body>
 </html>

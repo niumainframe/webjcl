@@ -1,0 +1,32 @@
+<h3 class="lightText">
+	Reference
+	<input class="search" type="text" ng-model="referenceSearch" placeholder="Search" />
+	<button class="btn btn-sm btn-link" ng-show="referenceSearch" ng-click="referenceSearch = ''">Clear</button>
+</h3>
+<div class="row" ng-repeat="group in groups | filter:referenceSearch">
+	<div class="col-md-2 lightText">{{group.name}}</div>
+	<div class="col-md-10">
+		<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-default" ng-repeat="item in group.items | filter:referenceSearch">
+				<div class="panel-heading" role="tab" id="referenceHeading{{$index}}">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#referenceCollapse{{$parent.$index}}{{$index}}" aria-expanded="false" aria-controls="referenceCollapse{{$parent.$index}}{{$index}}">
+							<div class="row">
+								<div class="col-md-4">{{item.name}}</div>
+								<strong><div class="col-md-8 text-right" btf-markdown="item.format"></div></strong>
+							</div>
+						</a>
+					</h4>
+				</div>
+				<div id="referenceCollapse{{$parent.$index}}{{$index}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="referenceHeading{{$index}}">
+					<div class="panel-body">
+						<h3>Definition</h3>
+						<div btf-markdown="item.description"></div>
+						<h3>Example</h3>
+						<div btf-markdown="item.example"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

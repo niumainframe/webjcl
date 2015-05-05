@@ -6605,6 +6605,49 @@ body {
   overflow: auto;
   position: absolute;
   font-family: 'Source Code Pro', 'monospace';
+  line-height: 14px;
+}
+#reference {
+  position: absolute;
+  bottom: 25px;
+  left: 20px;
+  opacity: .9;
+}
+#reference.expanded {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 1;
+  height: calc(40% - 80px);
+  background: #333333;
+  padding: 20px;
+  overflow: auto;
+}
+#reference.expanded .lightText {
+  color: #fff;
+}
+#reference.expanded h3 {
+  margin-top: 0;
+}
+#reference.expanded .close,
+#reference.expanded .btn-link {
+  color: #fff;
+  opacity: .5;
+}
+#reference.expanded li p {
+  margin: 0;
+}
+#reference .search {
+  font-size: .6em;
+  margin-left: 10px;
+  background: #555;
+  border: 1px solid #000;
+  border-radius: 3px;
+  padding: 3px 7px;
+  line-height: 22px;
+  position: relative;
+  top: -3px;
+  color: #fff;
 }
 #resizer {
   background: #eaeaea;
@@ -6641,6 +6684,10 @@ body {
 .tooltip-inner small {
   /* keyboard shortcuts */
   color: #ffe45d;
+}
+code {
+  font-family: 'Source Code Pro', 'monospace';
+  padding: 1px 2px;
 }
 /* CodeMirror */
 .CodeMirror {
