@@ -28,12 +28,8 @@ JobController.prototype.submitJob = function (body, un, pw) {
                 body: body,
                 user: un
             });
-            
-            self.jobRepository.saveJob(job)
-                .then(function (savedJobID) {
-                    job.id = savedJobID;
-                    ourDefer.resolve(job);
-                });
+
+            ourDefer.resolve(job);
         }, function(error) {
             
             ourDefer.reject(error);
@@ -41,6 +37,18 @@ JobController.prototype.submitJob = function (body, un, pw) {
         });
         
     
+    return ourDefer.promise;
+}
+
+JobController.prototype.saveJob = function(job) {
+    var ourDefer =  Q.defer();
+
+    this.jobRepository.saveJob(job)
+        .then(function (savedJobID) {
+            job.id = savedJobID;
+            ourDefer.resolve(job);
+        });
+
     return ourDefer.promise;
 }
 

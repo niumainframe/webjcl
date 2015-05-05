@@ -6,12 +6,24 @@
 	  'webJCL.TextDownloader',
 	  'webJCL.Authenticator',
 	  'webJCL.CodeReference',
+	  'webJCL.JobService',
 	])
 	.controller('MainController', MainController);
 
-	MainController.$inject = ['$scope', 'JCLProcessor', 'TextDownloader', 'Authenticator'];
+	MainController.$inject = ['$scope', '$location', 'JCLProcessor', 'TextDownloader', 'Authenticator', 'JobService'];
 
-	function MainController($scope, JCLProcessor, TextDownloader, Authenticator) {
+	function MainController($scope, $location, JCLProcessor, TextDownloader, Authenticator, JobService) {
+		
+		if ($location.path().length > 1) {
+			// Load saved job
+			JobService.getJob($location.path().substring(1))
+				.then(function (job){
+					console.log(job);
+					$scope.input = job.body;
+					$scope.output = job.output;
+			});
+		}
+
 		$scope.codemirrorOptions = {
 			lineNumbers: true,
 			autofocus: true,
@@ -73,13 +85,20 @@
 			return Authenticator.getLoginID();
 		}
 
-		$scope.generateUniqueLink = function() {
-			$scope.uniqueLink = "bbaabbabaabf";
-			// TODO uniqueLink popover should become its own directive
-			// and this setTimeout should absolutely be avoided
-			setTimeout(function(){ 
-				$('#uniqueLink').focus().select();   
-			},0);
+		$scope.share = function() {
+			JobService.shareJob({
+				body: $scope.input,
+				output: $scope.output
+				})
+				.then(function(saveID){
+					$scope.uniqueLink = $location.protocol()+"://"+$location.host()+'/#'+saveID;
+					console.log($scope.uniqueLink);
+					// TODO uniqueLink popover should become its own directive
+					// and this setTimeout should absolutely be avoided
+					setTimeout(function(){ 
+						$('#uniqueLink').val($scope.uniqueLink).focus().select();   
+					},0);
+				});
 		};
 
 		$scope.downloadInput = function() {

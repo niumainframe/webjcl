@@ -13,7 +13,7 @@ function JobRepository (config) {
 JobRepository.prototype.saveJob = function (job) {
     
     var deferred = Q.defer();
-    
+
     delete job.id;
     
     this.db.collection('Jobs', {safe:true}, function (err, coll) {

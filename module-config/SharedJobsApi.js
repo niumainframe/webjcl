@@ -13,7 +13,7 @@ var JobRepository = require(root + '/framework/JobRepository');
 var mongo = require(root + '/module-config/mongo');
 var JclProcessor = require(root + '/framework/JclProcessor');
 var FtpBasicAuth = require(root + '/util/middleware').FtpBasicAuth
-var JobsApi = require(root + '/http/JobsApi');
+var SharedJobsApi = require(root + '/http/SharedJobsApi');
 
 
 
@@ -26,18 +26,13 @@ var jclProcessor = new JclProcessor({
         port: config.ftpPort
     });
 
-var credentialsTTL = 30 * 60;
-var ftpBasicAuth = FtpBasicAuth(config.ftpHost, 
-    config.ftpPort, credentialsTTL);
-
 var jobController = new JobController({
         jclProcessor: jclProcessor,
         jobRepository: jobRepository
     });
 
-var configuredJobsApi = JobsApi({
-    jobController: jobController,
-    authenticator: ftpBasicAuth
+var configuredJobsApi = SharedJobsApi({
+    jobController: jobController
 });
 
 module.exports = configuredJobsApi;

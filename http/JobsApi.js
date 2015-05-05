@@ -28,7 +28,7 @@ function JobsApi(config) {
     app.use(config.authenticator);
     app.use(middleware.textBodyParser);
     
-    app.get('/jobs', function (req, res) {
+    app.get('/', function (req, res) {
         
         jobController
             .listJobs(req.user)
@@ -37,7 +37,7 @@ function JobsApi(config) {
             });;
     });
 
-    app.post('/jobs', function (req, res) {
+    app.post('/', function (req, res) {
         
             if(!req.is('text/plain')) {
                 res.send(415, "This only accepts 'text/plain'");
@@ -54,7 +54,7 @@ function JobsApi(config) {
                 });
     });
 
-    app.get('/jobs/:id', function (req, res) {
+    app.get('/:id', function (req, res) {
         
         jobController
             .getJobById(req.params['id'])
