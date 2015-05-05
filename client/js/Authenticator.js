@@ -69,7 +69,6 @@
 						password: getPassword(),
 					});
 				}, function () {
-					console.log('Modal dismissed at: ' + new Date());
 					defer.reject('error');
 				});
 			}
@@ -113,8 +112,6 @@
 		}
 
 		function shouldRememberCredentials() {
-			console.log("Should remember?");
-			console.log(localStorageService.get(STORAGE_KEY_REMEMBER_SETTING));
 			return localStorageService.get(STORAGE_KEY_REMEMBER_SETTING);
 		}
 	}
